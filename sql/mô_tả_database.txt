@@ -1,0 +1,8 @@
+- user sẽ có id, username, password, avatar.
+
+- sign có id, name, image, type, description (type: 1: biển báo cấm, 2: biển báo nguy hiểm, 3: biển hiệu lệnh, 4: biển chỉ dẫn, 
+5: biển báo phụ, 6: vạch kẻ đường, 7: biển báo trên đường cao tốc, 8: biển báo tốc độ, 
+9: biển báo cấm vượt và hết vượt, 10: biển báo ra vào khu dân cư)
+
+-history: sẽ lưu trữ hoạt động của user dựa vào id_user và type (1: upload, 2: scan), lưu trữ image ảnh đã upload hoặc scan,
+lưu thời gian thực hành
