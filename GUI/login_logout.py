@@ -8,8 +8,37 @@ from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import Screen, ScreenManager, SlideTransition
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
+from kivy.graphics import Color, RoundedRectangle
+from kivy.uix.button import Button
 
+class RoundedButton(Button):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.background_color = (0, 0, 0, 0)  # Ẩn nền mặc định
+        self.border_radius = [20]  # Bo góc tròn hơn
 
+        with self.canvas.before:
+            self.color_bg = Color(*self.background_normal_color())  # Màu nền
+            self.rect = RoundedRectangle(size=self.size, pos=self.pos, radius=self.border_radius)
+
+        self.bind(pos=self.update_rect, size=self.update_rect)
+
+    def background_normal_color(self):
+        return (0.2, 0.6, 1, 1)  # Mặc định màu xanh dương
+
+    def update_rect(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = self.size
+
+    def background_normal_color(self):
+        """Định nghĩa màu nền của nút"""
+        if 'background_color' in self.__dict__:
+            return self.background_color
+        return (0.2, 0.6, 1, 1)  # Mặc định màu xanh dương
+
+    def update_rect(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = self.size
 
 class Main(Screen):
     def __init__(self, **kwargs):
@@ -18,7 +47,7 @@ class Main(Screen):
         #layout = BoxLayout(orientation= 'vertical')
         #Thêm hình nền (background)
         self.bg = Image(
-            source="bg.jpg",  # Đổi thành đường dẫn ảnh của bạn
+            source="image/bg.jpg",  # Đổi thành đường dẫn ảnh của bạn
             size_hint=(1, 1),  # Ảnh sẽ lấp đầy màn hình
             allow_stretch=True,  # Cho phép kéo giãn ảnh để vừa với màn hình
             keep_ratio=False,  # Không giữ tỷ lệ gốc
@@ -38,7 +67,7 @@ class Main(Screen):
         self.add_widget(self.header)
         # Hình ảnh đặt ở vị trí cụ thể
         self.img = Image(
-            source="—Pngtree—various road traffic signs_8255888.png",
+            source="image/—Pngtree—various road traffic signs_8255888.png",
             size_hint=(None, None),
             size=(250, 250),  # Kích thước ảnh
             pos_hint={"center_x": 0.5, "y": 0.6},  # Đặt tọa độ
@@ -83,7 +112,7 @@ class Login(Screen):
 
         # Thêm hình nền (background)
         self.bg = Image(
-            source="bg.jpg",  # Đổi thành đường dẫn ảnh của bạn
+            source="image/bg.jpg",  # Đổi thành đường dẫn ảnh của bạn
             size_hint=(1, 1),  # Ảnh sẽ lấp đầy màn hình
             allow_stretch=True,  # Cho phép kéo giãn ảnh để vừa với màn hình
             keep_ratio=False,  # Không giữ tỷ lệ gốc
@@ -91,7 +120,7 @@ class Login(Screen):
         self.add_widget(self.bg)
         # Hình ảnh đặt ở vị trí cụ thể
         self.img = Image(
-            source="—Pngtree—various road traffic signs_8255888.png",
+            source="image/—Pngtree—various road traffic signs_8255888.png",
             size_hint=(None, None),
             size=(250, 250),  # Kích thước ảnh
             pos_hint={"center_x": 0.5, "y": 0.65},  # Đặt tọa độ
@@ -135,7 +164,7 @@ class Login(Screen):
             text="Nếu bạn chưa có tài khoản bấm đăng ký!", 
             font_size=20,
             color=(0, 0, 0, 1),
-            pos_hint={"center_x": 0.5, "center_y": 0.15},
+            pos_hint={"center_x": 0.5, "center_y": 0.25},
             bold = [True]
             )
         self.add_widget(self.label)
@@ -147,12 +176,12 @@ class Login(Screen):
             size=(300, 80),
             background_color=(1, 0.3, 0.3, 1),  # Màu đỏ
             color=(1, 1, 1, 1),
-            pos_hint={'center_x':0.5 , 'y':0.01 }
+            pos_hint={'center_x':0.5 , 'y':0.12 }
         )
         self.add_widget(self.register_btn)
         self.register_btn.bind(on_press=self.go_to_register)
         
-        self.back_main = Button(
+        self.back_main = RoundedButton(
             text="X",
             bold = [True],
             size_hint=(None, None),
@@ -176,7 +205,7 @@ class Register(Screen):
         super().__init__(**kwargs)
         # Thêm hình nền (background)
         self.bg = Image(
-            source="bg.jpg",  # Đổi thành đường dẫn ảnh của bạn
+            source="image/bg.jpg",  # Đổi thành đường dẫn ảnh của bạn
             size_hint=(1, 1),  # Ảnh sẽ lấp đầy màn hình
             allow_stretch=True,  # Cho phép kéo giãn ảnh để vừa với màn hình
             keep_ratio=False,  # Không giữ tỷ lệ gốc
@@ -184,7 +213,7 @@ class Register(Screen):
         self.add_widget(self.bg)
         # Hình ảnh đặt ở vị trí cụ thể
         self.img = Image(
-            source="—Pngtree—various road traffic signs_8255888.png",
+            source="image/—Pngtree—various road traffic signs_8255888.png",
             size_hint=(None, None),
             size=(250, 250),  # Kích thước ảnh
             pos_hint={"center_x": 0.5, "y": 0.65},  # Đặt tọa độ
@@ -203,7 +232,7 @@ class Register(Screen):
         self.add_widget(self.username_input)
         
         self.numberphone_input = TextInput(
-            hint_text="Số điện thoại",
+            hint_text="Mật khẩu",
             size_hint=(None, None),
             size=(400, 50),
             pos_hint={"center_x": 0.5, "center_y": 0.45},
@@ -214,7 +243,7 @@ class Register(Screen):
         self.add_widget(self.numberphone_input)
         
         self.password_input = TextInput(
-            hint_text="Mật khẩu",
+            hint_text="Xác nhận Mật khẩu",
             size_hint=(None, None),
             size=(400, 50),
             pos_hint={"center_x": 0.5, "center_y": 0.35},
@@ -256,14 +285,13 @@ class Register(Screen):
         self.add_widget(self.label)
         self.login_btn.bind(on_press=self.go_to_login)
         
-        self.back_main = Button(
+        self.back_main = RoundedButton(
             text="X",
-            bold = [True],
+            font_size=20,
             size_hint=(None, None),
             size=(50, 50),
-            background_color=(1, 1, 0, 1),  
             color=(0, 0, 0, 1),
-            pos_hint={'center_x':0.07 , 'y':0.9 }
+            pos_hint={'center_x': 0.07, 'y': 0.9},
         )
         self.add_widget(self.back_main)
         self.back_main.bind(on_press=self.back_to_main)
