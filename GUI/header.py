@@ -33,22 +33,16 @@ class CircularImage(ButtonBehavior, Widget):
             self.screen_manager.current = 'user'
 
     def update_graphics(self, *args):
-        self.canvas.clear()
-        with self.canvas:
-            StencilPush()
-            self.mask = Ellipse(pos=self.pos, size=self.size)
-            StencilUse()
-            self.img = Image(source=self.source, pos=self.pos, size=self.size)
-            StencilUnUse()
-            StencilPop()
-            # Viền trắng quanh avatar
-            Color(1, 1, 1, 1)
-            self.border = Line(ellipse=(self.x, self.y, self.width, self.height), width=2)
+        self.mask.pos = self.pos
+        self.mask.size = self.size
+        self.img.pos = self.pos
+        self.img.size = self.size
+        self.border.ellipse = (self.x, self.y, self.width, self.height)
 
 
 # Lớp Header hiển thị thanh tiêu đề
 class Header(BoxLayout):
-    def __init__(self, screen_manager, **kwargs):
+    def __init__(self, screen_manager, title, **kwargs):
         super().__init__(size_hint_y=None, height="80dp", padding=[10, 10], spacing=10, **kwargs)
 
         self.screen_manager = screen_manager  # Nhận ScreenManager để điều hướng
@@ -58,7 +52,7 @@ class Header(BoxLayout):
             self.rect = RoundedRectangle(size=self.size, pos=self.pos, radius=[10, 10, 0, 0])
         self.bind(size=self.update_rect, pos=self.update_rect)
 
-        # Ảnh đại diện hình tròn (truyền screen_manager vào)
+        # Ảnh đại diện hình tròn
         self.avatar = CircularImage(source="image/uta.jpg", screen_manager=self.screen_manager, size=(60, 60))
 
         # Thông tin người dùng
@@ -71,7 +65,7 @@ class Header(BoxLayout):
         self.user_info.add_widget(self.upload_count_label)
 
         # Tiêu đề trang
-        self.title_label = Label(text="Trang Chủ", bold=True, color=(1, 1, 1, 1), font_size=40)
+        self.title_label = Label(text=title, bold=True, color=(1, 1, 1, 1), font_size=40)
 
         # Bố cục
         self.add_widget(self.avatar)
@@ -92,7 +86,7 @@ class MainScreen(Screen):
         layout = BoxLayout(orientation="vertical")
 
         # Thêm Header vào màn hình chính
-        self.header = Header(screen_manager=screen_manager)
+        self.header = Header(screen_manager=screen_manager, title="Trang Chủ")
         layout.add_widget(self.header)
 
         self.add_widget(layout)
@@ -100,8 +94,10 @@ class MainScreen(Screen):
 
 # Màn hình User khi nhấn vào Avatar
 class UserScreen(Screen):
-    def __init__(self, **kwargs):
+    def __init__(self, screen_manager, **kwargs):
         super().__init__(**kwargs)
+        self.screen_manager = screen_manager
+
         layout = BoxLayout(orientation="vertical", padding=20, spacing=15)
 
         title = Label(text="Màn hình User", font_size=24, color=(1, 1, 1, 1))
@@ -116,7 +112,7 @@ class UserScreen(Screen):
 
     def go_back(self, instance, touch):
         if instance.collide_point(*touch.pos):
-            self.manager.current = "main"
+            self.screen_manager.current = "main"
 
 
 # Chạy ứng dụng
@@ -125,11 +121,3 @@ class MyApp(MDApp):
         sm = ScreenManager()
 
         # Thêm màn hình chính và màn hình user vào ScreenManager
-        sm.add_widget(MainScreen(sm, name='main'))  # Màn hình chính
-        sm.add_widget(UserScreen(name='user'))  # Màn hình user
-
-        return sm  # Trả về ScreenManager làm root
-
-
-if __name__ == "__main__":
-    MyApp().run()

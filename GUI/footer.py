@@ -27,7 +27,7 @@ class Footer(BoxLayout):
         home_layout.add_widget(home_button)
 
         # Câu khẩu hiệu
-        slogan_label = Label(text="Không uống rượu bia khi lái xe", bold=True,
+        slogan_label = Label(text="Không uống xe khi lái rượu bia", bold=True,
                              color=(0.2, 0.2, 0.2, 1), font_size=22, valign='center')
 
         # Layout chứa nút Logout

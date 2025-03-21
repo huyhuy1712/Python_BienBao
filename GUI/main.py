@@ -9,7 +9,9 @@ from kivy.uix.image import Image
 from footer import Footer
 from header import Header
 from scan import ScanScreen
+from uploadAnh import UploadScreen
 from user import EditProfileScreen
+from lichSu import HistoryScreen
 
 
 
@@ -21,7 +23,7 @@ class MainScreen(Screen):
         layout = BoxLayout(orientation='vertical')
 
         # Tạo Header có screen_manager để điều hướng
-        self.header = Header(screen_manager=self.screen_manager)
+        self.header = Header(screen_manager=self.screen_manager,title="Trang chủ")
         layout.add_widget(self.header)
   
         
@@ -33,7 +35,7 @@ class MainScreen(Screen):
         self.add_section("Xem Thông Tin Biển Báo", "image/sign_icon.png", (0.5, 0.7, 1, 1), 'info')
         self.add_section("Xem Lịch Sử", "image/history_icon.png", (0.5, 1, 0.5, 1), 'history')
         self.add_section("Scan Ảnh", "image/scan_icon.png", (0.9, 0.9, 0.4, 1), 'scan')
-        # self.add_section("Scan Ảnh", "image/scan_icon.png", (0.9, 0.9, 0.4, 1), 'scan')
+     
         
         layout.add_widget(self.main_layout)
 
@@ -66,19 +68,7 @@ class MainScreen(Screen):
     def on_section_touch(self, instance, touch, screen_name):
         if instance.collide_point(*touch.pos):
             if self.manager:
-                # Dictionary ánh xạ screen_name với tiêu đề mong muốn
-                titles = {
-                    "upload": "Upload Hình Ảnh",
-                    "info": "Xem Thông Tin Biển Báo",
-                    "history": "Xem Lịch Sử",
-                    "scan": "Scan Ảnh"
-                }
-                # Cập nhật tiêu đề nếu tồn tại
-                if screen_name in titles:
-                    header_screen = self.manager.get_screen(screen_name)
-                    if hasattr(header_screen, "header"):
-                        header_screen.header.title_label.text = titles[screen_name]
-                
+
                 print(f"Chuyển sang màn hình: {screen_name}")  
                 self.manager.current = screen_name
             else:
@@ -98,6 +88,10 @@ class MyApp(MDApp):
         main_screen = MainScreen(sm, name='main')
         # Tạo ScanScreen và truyền Header
         scan_screen = ScanScreen(sm, name='scan')
+        # Tạo UploadScreen truyền vào ScreenManager
+        upload_screen = UploadScreen(sm,name='upload')
+        # Tạo UploadScreen truyền vào ScreenManager
+        history_screen = HistoryScreen(sm,name='history')
         
                 # Tạo màn hình User
         user_screen = Screen(name='user')
@@ -107,6 +101,8 @@ class MyApp(MDApp):
         sm.add_widget(main_screen)  # Thêm màn hình chính
         sm.add_widget(scan_screen)  # Thêm màn hình Scan
         sm.add_widget(user_screen) # Thêm màn hình user
+        sm.add_widget(upload_screen) # Thêm màn hình user
+        sm.add_widget(history_screen) # Thêm màn hình user
 
 
         print("Danh sách màn hình trong ScreenManager:", sm.screen_names)
