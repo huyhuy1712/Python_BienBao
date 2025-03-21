@@ -10,11 +10,18 @@ from kivymd.app import MDApp
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.textfield import MDTextField
 from kivy.graphics import Color, Line
+from kivy.core.window import Window
 from kivy.uix.button import Button
+from kivy.uix.screenmanager import Screen, ScreenManager
+
+from footer import Footer
+from header import Header
 
 class BorderedBox(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        
+        
         with self.canvas.before:
             Color(0.7, 0.7, 0.7, 1)
             self.line = Line(rectangle=(self.x, self.y, self.width, self.height), width=1)
@@ -34,15 +41,17 @@ class BorderedLabel(Label):
     def update_graphics(self, *args):
         self.line.rectangle = (self.x, self.y, self.width, self.height)
 
-class HistoryScreen(BoxLayout):
-    def __init__(self, **kwargs):
-        super().__init__(orientation="vertical", spacing=10, padding=20, **kwargs)
-        
+class HistoryScreen(BoxLayout,Screen):
+    def __init__(self,screen_manager, **kwargs):
+        super().__init__(orientation="vertical", spacing=10, padding=0, **kwargs)
+        self.date_input = MDTextField(hint_text="dd/mm/yy", size_hint=(0.3, 1), readonly=True, mode="rectangle")
         self.md_bg_color = (1, 1, 1, 1)
+
+        self.add_widget(Header(screen_manager,"Lịch Sử"))
 
         # Thanh tìm kiếm
         search_layout = BoxLayout(size_hint=(1, 0.1), spacing=5)
-        self.search_input = MDTextField(hint_text="Tìm kiếm...", font_size=16, size_hint=(0.7, 1), mode="rectangle")
+        self.search_input = MDTextField(hint_text="Tìm kiếm...", font_size=16, size_hint=(0.7,None), height=2, mode="rectangle")
         self.clear_button = MDIconButton(icon="close-circle", size_hint=(None, None))
         self.search_icon = MDIconButton(icon="magnify", size_hint=(None, None))
         self.refresh_icon = MDIconButton(icon="refresh", size_hint=(None, None))
@@ -56,7 +65,7 @@ class HistoryScreen(BoxLayout):
 
         # Thanh bộ lọc
         filter_sort_layout = BoxLayout(size_hint=(1, 0.1), spacing=10)
-        self.date_input = MDTextField(hint_text="dd/mm/yy", size_hint=(0.2, 1), readonly=True, mode="rectangle")
+        self.date_input = MDTextField(hint_text="dd/mm/yy", readonly=True, mode="rectangle")
         self.date_button = MDIconButton(icon="calendar", size_hint=(None, None))
         self.date_button.bind(on_release=self.show_date_picker)
         self.filter_type = Spinner(text="Hoạt động", values=["Upload", "Scan"], size_hint=(0.3, 1))
@@ -109,6 +118,8 @@ class HistoryScreen(BoxLayout):
         pagination_layout.add_widget(BoxLayout(size_hint_x=0.4))  # Khoảng trống phải
 
         self.add_widget(pagination_layout)
+        self.add_widget(Footer(screen_manager))
+
 
 
     def clear_search(self, instance):
@@ -130,38 +141,63 @@ class HistoryScreen(BoxLayout):
     def populate_table(self):
         self.history_table.clear_widgets()
         headers = ["Ảnh", "Mô tả", "Loại hoạt động", "Thời gian"]
-        column_widths = [100, 450, 400, 350]
+
+        # Lấy kích thước màn hình
+        screen_width, screen_height = Window.size
+
+        # Xác định tỷ lệ chiều rộng cột theo màn hình
+        column_widths = [
+            int(screen_width * 0.10),  # Ảnh (10% màn hình)
+            int(screen_width * 0.40),  # Mô tả (40% màn hình)
+            int(screen_width * 0.25),  # Loại hoạt động (25% màn hình)
+            int(screen_width * 0.25),  # Thời gian (25% màn hình)
+    ]
+
         
+        # Tạo tiêu đề
         for header, width in zip(headers, column_widths):
-            lbl = BorderedLabel(text=header, bold=True, color=(0, 0, 0, 1),
-                        size_hint_x=None, width=width, size_hint_y=None, height=50,
-                        text_size=(width, None), halign="center", valign="middle")
+            lbl = BorderedLabel(
+                text=header, bold=True, color=(0, 0, 0, 1),
+                size_hint_x=None, width=width, size_hint_y=None, height=40,  # Giảm chiều cao tiêu đề
+                text_size=(width, None), halign="center", valign="middle"
+            )
             lbl.texture_update()
             self.history_table.add_widget(lbl)
 
+        # Thêm dữ liệu vào bảng
         for img_src, desc, activity, time in self.sample_data:
-            img_border = BorderedBox(size_hint_x=None, width=column_widths[0], size_hint_y=None, height=80)
-            img_layout = BoxLayout(size_hint=(1, 1), padding=5)
-            img = Image(source=img_src, size_hint=(None, None), size=(50, 50))
+            img_border = BorderedBox(size_hint_x=None, width=column_widths[0], size_hint_y=None, height=60)  # Giảm chiều cao hàng
+            img_layout = BoxLayout(size_hint=(1, 1), padding=2)
+            img = Image(source=img_src, size_hint=(None, None), size=(40, 40))  # Giảm kích thước ảnh
             img_layout.add_widget(img)
             img_border.add_widget(img_layout)
             
-            desc_label = BorderedLabel(text=self.truncate_text(desc, 60), color=(0, 0, 0, 1),
-                               size_hint_x=None, width=column_widths[1], size_hint_y=None, height=80, 
-                               text_size=(column_widths[1], 80), halign="left", valign="middle")
-            activity_label = BorderedLabel(text=activity, color=(0, 0, 0, 1),
-                                   size_hint_x=None, width=column_widths[2], size_hint_y=None, height=80, halign="center", valign="middle")
-            time_label = BorderedLabel(text=time, color=(0, 0, 0, 1),
-                               size_hint_x=None, width=column_widths[3], size_hint_y=None, height=80, halign="center", valign="middle")
+            desc_label = BorderedLabel(
+                text=self.truncate_text(desc, 40), color=(0, 0, 0, 1),
+                size_hint_x=None, width=column_widths[1], size_hint_y=None, height=60,  # Giảm chiều cao
+                text_size=(column_widths[1], 60), halign="left", valign="middle"
+            )
+            activity_label = BorderedLabel(
+                text=activity, color=(0, 0, 0, 1),
+                size_hint_x=None, width=column_widths[2], size_hint_y=None, height=60,
+                halign="center", valign="middle"
+            )
+            time_label = BorderedLabel(
+                text=time, color=(0, 0, 0, 1),
+                size_hint_x=None, width=column_widths[3], size_hint_y=None, height=60,
+                halign="center", valign="middle"
+            )
             
             self.history_table.add_widget(img_border)
             self.history_table.add_widget(desc_label)
             self.history_table.add_widget(activity_label)
             self.history_table.add_widget(time_label)
 
+
 class HistoryApp(MDApp):
     def build(self):
-        return HistoryScreen()
+        sm = ScreenManager()
+        return HistoryScreen(sm)
 
 if __name__ == "__main__":
     HistoryApp().run()
