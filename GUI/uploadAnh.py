@@ -4,10 +4,20 @@ from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.graphics import Color, RoundedRectangle
 from kivy.core.window import Window
+from kivy.uix.screenmanager import Screen, ScreenManager
 
-class UploadScreen(BoxLayout):
-    def __init__(self, **kwargs):
-        super().__init__(orientation='vertical', spacing=15, padding=[20, 50, 20, 20], **kwargs)
+
+# Import từ các file header.py và footer.py
+from footer import Footer
+from header import Header
+
+class UploadScreen(BoxLayout,Screen):
+    def __init__(self,screen_manager, **kwargs):
+        super().__init__(orientation='vertical', spacing=15, **kwargs)
+        
+                # Thêm header từ file header.py
+        self.add_widget(Header(screen_manager,"Upload Ảnh"))
+
 
         # **KHU VỰC HÌNH ẢNH**
         self.image_container = BoxLayout(size_hint=(0.85, 0.5), pos_hint={'center_x': 0.5})
@@ -38,6 +48,9 @@ class UploadScreen(BoxLayout):
         button_container.add_widget(self.search_btn)
         button_container.add_widget(self.history_btn)
         self.add_widget(button_container)
+        
+                # Thêm footer từ file footer.py
+        self.add_widget(Footer(screen_manager))
 
     def create_rounded_button(self, text, color):
         """Tạo nút bo tròn hoàn toàn"""
@@ -63,8 +76,10 @@ class UploadScreen(BoxLayout):
 
 class UploadApp(App):
     def build(self):
+        sm = ScreenManager()
+
         Window.clearcolor = (1, 1, 1, 1)  # Nền trắng
-        return UploadScreen()
+        return UploadScreen(sm)
 
 if __name__ == "__main__":
     UploadApp().run()
