@@ -69,7 +69,7 @@ class Main(Screen):
         self.add_widget(self.header)
         # Hình ảnh đặt ở vị trí cụ thể
         self.img = Image(
-            source="image/—Pngtree—various road traffic signs_8255888.png",
+            source="image\logo.png",
             size_hint=(None, None),
             size=(250, 250),  # Kích thước ảnh
             pos_hint={"center_x": 0.5, "y": 0.6},  # Đặt tọa độ
@@ -122,7 +122,7 @@ class Login(Screen):
         self.add_widget(self.bg)
         # Hình ảnh đặt ở vị trí cụ thể
         self.img = Image(
-            source="image/—Pngtree—various road traffic signs_8255888.png",
+            source="image\logo.png",
             size_hint=(None, None),
             size=(250, 250),  # Kích thước ảnh
             pos_hint={"center_x": 0.5, "y": 0.65},  # Đặt tọa độ
@@ -215,7 +215,7 @@ class Register(Screen):
         self.add_widget(self.bg)
         # Hình ảnh đặt ở vị trí cụ thể
         self.img = Image(
-            source="image/—Pngtree—various road traffic signs_8255888.png",
+            source="image\logo.png",
             size_hint=(None, None),
             size=(250, 250),  # Kích thước ảnh
             pos_hint={"center_x": 0.5, "y": 0.65},  # Đặt tọa độ
