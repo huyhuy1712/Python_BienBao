@@ -11,6 +11,7 @@ from header import Header
 from scan import ScanScreen
 from uploadAnh import UploadScreen
 from user import EditProfileScreen
+from inf_signs import PageScreen
 from lichSu import HistoryScreen
 
 
@@ -78,12 +79,11 @@ class MainScreen(Screen):
         instance.rect.size = instance.size
         instance.rect.pos = instance.pos
 
-
+        
 class MyApp(MDApp):
     def build(self):
         sm = ScreenManager()
-
-
+        
         # Tạo MainScreen và truyền screen_manager
         main_screen = MainScreen(sm, name='main')
         # Tạo ScanScreen và truyền Header
@@ -92,6 +92,9 @@ class MyApp(MDApp):
         upload_screen = UploadScreen(sm,name='upload')
         # Tạo UploadScreen truyền vào ScreenManager
         history_screen = HistoryScreen(sm,name='history')
+
+
+
         
                 # Tạo màn hình User
         user_screen = Screen(name='user')
@@ -103,8 +106,12 @@ class MyApp(MDApp):
         sm.add_widget(user_screen) # Thêm màn hình user
         sm.add_widget(upload_screen) # Thêm màn hình user
         sm.add_widget(history_screen) # Thêm màn hình user
+        sm.add_widget(PageScreen('info',sm)) # Thêm màn hình user
 
-
+                # Thêm các PageScreen vào sm
+        for i in range(1, 11):
+            sm.add_widget(PageScreen(i,sm))
+            
         print("Danh sách màn hình trong ScreenManager:", sm.screen_names)
 
 
