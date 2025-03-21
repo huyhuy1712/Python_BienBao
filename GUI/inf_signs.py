@@ -7,6 +7,9 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
 from kivy.core.window import Window
+# Import từ các file header.py và footer.py
+from footer import Footer
+from header import Header
 
 class RoundedTextInput(TextInput):
     """Tùy chỉnh TextInput để bo góc & đổi màu nền thành xám."""
@@ -16,14 +19,13 @@ class RoundedTextInput(TextInput):
         self.background_active = ''
         self.background_color = (0.9, 0.9, 0.9, 1)  # Màu xám nhạt
         self.foreground_color = (0, 0, 0, 1)  # Màu chữ đen
-        self.padding = [10, 10]
         self.size_hint = (0.8, None)  # Giảm kích thước chiều ngang
-        self.height = 40  # Giảm chiều cao
         self.radius = [20, 20, 20, 20]  # Bo tròn góc 20px
 
 class PageScreen(Screen):
-    def __init__(self, page_number, screen_manager, **kwargs):
+    def __init__(self, page_number, screen_manager,sm, **kwargs):
         super().__init__(**kwargs)
+        
         self.name = f"page{page_number}"
         self.page_number = page_number
         self.screen_manager = screen_manager
@@ -31,14 +33,12 @@ class PageScreen(Screen):
         # Layout chính theo chiều dọc
         main_layout = BoxLayout(orientation="vertical", spacing=10, padding=10)
 
-        # Thanh tìm kiếm ở trên cùng với bo tròn
-        search_layout = BoxLayout(size_hint=(1, None), height=50, padding=[10, 0])
-        self.search_bar = RoundedTextInput(hint_text="Tìm kiếm...")
-        search_layout.add_widget(self.search_bar)
-        main_layout.add_widget(search_layout)
+                # Thêm header từ file header.py
+        main_layout.add_widget(Header(sm,"Biển Báo"))
+        
 
         # Layout chứa 5 nút chính (dùng hình ảnh bên trái)
-        button_layout = GridLayout(cols=1, spacing=10, size_hint=(None, None), size=(500, 600))
+        button_layout = GridLayout(cols=1, size_hint=(None, None), size=(300, 566))
         button_layout.pos_hint = {"center_x": 0.5, "center_y": 0.5}
 
         # Danh sách hình ảnh (thay bằng đường dẫn hình của bạn)
@@ -52,7 +52,7 @@ class PageScreen(Screen):
             img = Image(source=image_paths[i], size_hint=(None, None), size=(100, 100))
 
             # Nút (chỉ để hiển thị ảnh và text nếu cần)
-            btn = Button(text=f"Nút {i+1}", size_hint=(None, None), size=(400, 100))
+            btn = Button(text=f"Nút {i+1}", size_hint=(None, None), size=(250, 80))
             btn.bind(on_press=lambda instance, num=i+1: self.open_text_page(num))
 
             btn_layout.add_widget(img)  # Ảnh bên trái
@@ -76,6 +76,9 @@ class PageScreen(Screen):
         main_layout.add_widget(nav_layout)
 
         self.add_widget(main_layout)
+        
+                # Thêm footer từ file footer.py
+        self.add_widget(Footer(sm))
 
     def prev_page(self, instance):
         if self.page_number > 1:
@@ -127,10 +130,10 @@ class MyApp(App):
         Window.clearcolor = (1, 1, 1, 1)  # Đặt nền trắng
         
         sm = ScreenManager()
-
+        sm1 = ScreenManager()
         # Tạo 5 trang và thêm vào ScreenManager
         for i in range(1, 6):
-            sm.add_widget(PageScreen(i, sm))
+            sm.add_widget(PageScreen(i, sm,sm1))
 
         # Thêm trang hiển thị văn bản
         sm.add_widget(TextScreen())
