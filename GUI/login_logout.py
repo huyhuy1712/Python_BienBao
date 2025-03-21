@@ -10,6 +10,8 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Color, RoundedRectangle
 from kivy.uix.button import Button
+from kivy.uix.filechooser import FileChooserListView
+from kivy.uix.popup import Popup
 
 class RoundedButton(Button):
     def __init__(self, **kwargs):
@@ -67,7 +69,7 @@ class Main(Screen):
         self.add_widget(self.header)
         # Hình ảnh đặt ở vị trí cụ thể
         self.img = Image(
-            source="image/—Pngtree—various road traffic signs_8255888.png",
+            source="image\logo.png",
             size_hint=(None, None),
             size=(250, 250),  # Kích thước ảnh
             pos_hint={"center_x": 0.5, "y": 0.6},  # Đặt tọa độ
@@ -120,7 +122,7 @@ class Login(Screen):
         self.add_widget(self.bg)
         # Hình ảnh đặt ở vị trí cụ thể
         self.img = Image(
-            source="image/—Pngtree—various road traffic signs_8255888.png",
+            source="image\logo.png",
             size_hint=(None, None),
             size=(250, 250),  # Kích thước ảnh
             pos_hint={"center_x": 0.5, "y": 0.65},  # Đặt tọa độ
@@ -213,45 +215,62 @@ class Register(Screen):
         self.add_widget(self.bg)
         # Hình ảnh đặt ở vị trí cụ thể
         self.img = Image(
-            source="image/—Pngtree—various road traffic signs_8255888.png",
+            source="image\logo.png",
             size_hint=(None, None),
             size=(250, 250),  # Kích thước ảnh
             pos_hint={"center_x": 0.5, "y": 0.65},  # Đặt tọa độ
         )
         self.add_widget(self.img)
         
+        self.avatar = Image(
+            size_hint=(None,None),
+            size=(100,100),
+            pos_hint={'center_x':0.26 , 'center_y':0.58 },
+            allow_stretch=True
+        )
+        self.add_widget(self.avatar)
+        
+        upload_button = Button(
+            text="Chọn ảnh", 
+            size_hint=(None, None), 
+            size=(200, 50),
+            pos_hint={'center_x': 0.55, 'center_y':0.58 }
+            )
+        upload_button.bind(on_press=self.open_file_chooser)
+        self.add_widget(upload_button)
+        
         self.username_input = TextInput(
             hint_text="Tên đăng nhập",
             size_hint=(None, None),
             size=(400, 50),
-            pos_hint={"center_x": 0.5, "center_y": 0.55},
+            pos_hint={"center_x": 0.5, "center_y": 0.47},
             font_size=20,
             multiline=False,
             padding=[10, 10],
         )
         self.add_widget(self.username_input)
         
-        self.numberphone_input = TextInput(
+        self.password_input = TextInput(
             hint_text="Mật khẩu",
             size_hint=(None, None),
             size=(400, 50),
-            pos_hint={"center_x": 0.5, "center_y": 0.45},
-            font_size=20,
-            multiline=False,
-            padding=[10, 10],
-        )
-        self.add_widget(self.numberphone_input)
-        
-        self.password_input = TextInput(
-            hint_text="Xác nhận Mật khẩu",
-            size_hint=(None, None),
-            size=(400, 50),
-            pos_hint={"center_x": 0.5, "center_y": 0.35},
+            pos_hint={"center_x": 0.5, "center_y": 0.40},
             font_size=20,
             multiline=False,
             padding=[10, 10],
         )
         self.add_widget(self.password_input)
+        
+        self.password_input_again = TextInput(
+            hint_text="Xác nhận Mật khẩu",
+            size_hint=(None, None),
+            size=(400, 50),
+            pos_hint={"center_x": 0.5, "center_y": 0.33},
+            font_size=20,
+            multiline=False,
+            padding=[10, 10],
+        )
+        self.add_widget(self.password_input_again)
         
                         # Nút Đăng ký
         self.register_btn = Button(
@@ -302,6 +321,18 @@ class Register(Screen):
     def go_to_login(self, instance):
         self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "login"  # Chuyển sang màn hình đăng nhập
+    #tải ảnh lên
+    def open_file_chooser(self, instance):
+        content = FileChooserListView()
+        popup = Popup(title="Chọn ảnh", content=content, size_hint=(0.9, 0.9))
+
+        def select_file(instance, selection, *args):
+            if selection:
+                self.avatar.source = selection[0]  # Hiển thị ảnh đã chọn
+                popup.dismiss()
+
+        content.bind(on_submit=select_file)
+        popup.open()
 
 class MyApp(App):
     def build(self):
