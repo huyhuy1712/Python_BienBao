@@ -37,6 +37,7 @@ class PageScreen(Screen):
         main_layout.add_widget(Header(sm,"Biển Báo"))
         
 
+
         # Layout chứa 5 nút chính (dùng hình ảnh bên trái)
         button_layout = GridLayout(cols=1, size_hint=(None, None), size=(300, 566))
         button_layout.pos_hint = {"center_x": 0.5, "center_y": 0.5}
