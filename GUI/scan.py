@@ -19,7 +19,7 @@ class ScanScreen(Screen):
         self.main_layout = BoxLayout(orientation='vertical')
         
         # Thêm header từ file header.py
-        self.main_layout.add_widget(Header(screen_manager))
+        self.main_layout.add_widget(Header(screen_manager,"Scan Ảnh"))
 
         
         # Layout chính của nội dung giữa
