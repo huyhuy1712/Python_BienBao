@@ -22,21 +22,30 @@ class RoundedTextInput(TextInput):
         self.size_hint = (0.8, None)  # Giảm kích thước chiều ngang
         self.radius = [20, 20, 20, 20]  # Bo tròn góc 20px
 
+def is_not_number(value):
+    return not isinstance(value, (int, float))
+    
 class PageScreen(Screen):
-    def __init__(self, page_number, screen_manager,sm, **kwargs):
+    def __init__(self, page_number, screen_manager, **kwargs):
         super().__init__(**kwargs)
         
-        self.name = f"page{page_number}"
+        if(is_not_number(page_number)):
+          self.name = page_number
+        else:
+            self.name = f"page{page_number}"
+            
         self.page_number = page_number
-        self.screen_manager = screen_manager
-
         # Layout chính theo chiều dọc
         main_layout = BoxLayout(orientation="vertical", spacing=10, padding=10)
 
                 # Thêm header từ file header.py
-        main_layout.add_widget(Header(sm,"Biển Báo"))
+        main_layout.add_widget(Header(screen_manager,"Biển Báo"))
         
-
+        # Thanh tìm kiếm ở trên cùng với bo tròn
+        # search_layout = BoxLayout(size_hint=(1, None), height=50, padding=[10, 0])
+        # self.search_bar = RoundedTextInput(hint_text="Tìm kiếm...")
+        # search_layout.add_widget(self.search_bar)
+        # main_layout.add_widget(search_layout)
 
         # Layout chứa 5 nút chính (dùng hình ảnh bên trái)
         button_layout = GridLayout(cols=1, size_hint=(None, None), size=(300, 566))
@@ -79,7 +88,7 @@ class PageScreen(Screen):
         self.add_widget(main_layout)
         
                 # Thêm footer từ file footer.py
-        self.add_widget(Footer(sm))
+        self.add_widget(Footer(screen_manager))
 
     def prev_page(self, instance):
         if self.page_number > 1:
@@ -87,7 +96,7 @@ class PageScreen(Screen):
             self.screen_manager.current = f"page{self.page_number - 1}"
 
     def next_page(self, instance):
-        if self.page_number < 5:
+        if self.page_number < 12:
             self.screen_manager.transition = SlideTransition(direction="left")
             self.screen_manager.current = f"page{self.page_number + 1}"
 
@@ -131,10 +140,9 @@ class MyApp(App):
         Window.clearcolor = (1, 1, 1, 1)  # Đặt nền trắng
         
         sm = ScreenManager()
-        sm1 = ScreenManager()
         # Tạo 5 trang và thêm vào ScreenManager
         for i in range(1, 6):
-            sm.add_widget(PageScreen(i, sm,sm1))
+            sm.add_widget(PageScreen(i, sm))
 
         # Thêm trang hiển thị văn bản
         sm.add_widget(TextScreen())
