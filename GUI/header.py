@@ -28,7 +28,7 @@ class CircularImage(ButtonBehavior, Widget):
         self.bind(pos=self.update_graphics, size=self.update_graphics)
 
     def on_press(self):
-        print("Avatar được nhấn, chuyển sang màn hình user")
+        # print("Avatar được nhấn, chuyển sang màn hình user")
         if self.screen_manager:
             self.screen_manager.current = 'user'
 
