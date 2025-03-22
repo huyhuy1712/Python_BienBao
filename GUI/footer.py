@@ -50,7 +50,7 @@ class Footer(BoxLayout):
 
     def go_home(self, instance):
         if self.screen_manager and 'main' in self.screen_manager.screen_names:
-            print("Chuyển về màn hình main")
+            # print("Chuyển về màn hình main")
             self.screen_manager.current = 'main'
         else:
             print(" Lỗi: Không tìm thấy màn hình 'main'")
