@@ -70,7 +70,7 @@ class MainScreen(Screen):
         if instance.collide_point(*touch.pos):
             if self.manager:
 
-                print(f"Chuyển sang màn hình: {screen_name}")  
+                print(f"Chuyen sang man hinh: {screen_name}")  
                 self.manager.current = screen_name
             else:
                 print("ScreenManager chưa được gán vào MainScreen!")
