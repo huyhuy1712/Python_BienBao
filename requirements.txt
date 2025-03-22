@@ -1,3 +1,5 @@
 kivy
 mysql-connector-python
 kivymd
+pip install opencv-python
+pip install ffpyplayer
