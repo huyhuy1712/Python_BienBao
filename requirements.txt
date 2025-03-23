@@ -1,3 +1,5 @@
 kivy
 mysql-connector-python
 kivymd
+opencv-python
+ffpyplayer
