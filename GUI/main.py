@@ -61,7 +61,7 @@ class MainScreen(Screen):
 
         section.add_widget(box)
 
-        # Gán sự kiện khi nhấn vào section
+        # Gán sự kiện khi nhấn vào section  
         section.bind(on_touch_down=lambda instance, touch: self.on_section_touch(instance, touch, screen_name))
 
         self.main_layout.add_widget(section)
@@ -70,7 +70,7 @@ class MainScreen(Screen):
         if instance.collide_point(*touch.pos):
             if self.manager:
 
-                print(f"Chuyển sang màn hình: {screen_name}")  
+                print(f"Chuyen sang man hinh: {screen_name}")  
                 self.manager.current = screen_name
             else:
                 print("ScreenManager chưa được gán vào MainScreen!")
