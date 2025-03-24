@@ -25,7 +25,7 @@ class ImageButton(RelativeLayout):
         btn = Button(
             text=text,
             background_normal='',  # Loại bỏ màu nền mặc định
-            background_color=(0, 0, 0, 0.5),  # Làm trong suốt 50%
+            background_color=(0, 0, 0, 0.1),  # Làm trong suốt 50%
             size_hint=(1, 1)
         )
 
@@ -47,7 +47,7 @@ class PageScreen(Screen):
         search_bar = TextInput(
             hint_text="Tìm kiếm biển báo...",
             size_hint=(1, None),
-            height=50
+            height=40
         )
         search_layout.add_widget(search_bar)
         main_layout.add_widget(search_layout)
@@ -62,7 +62,7 @@ class PageScreen(Screen):
         )
 
         # Danh sách ảnh mẫu (Bạn có thể thay bằng ảnh thực tế)
-        images = ["image/bg.jpg"]*9
+        images = ["image\sign_icon.png"]*8
 
         for i in range(1, 9):
             img_button = ImageButton(text=f"", image_source=images[i - 1])
