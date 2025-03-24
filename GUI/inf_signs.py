@@ -1,152 +1,86 @@
 from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.button import Button
 from kivy.uix.image import Image
-from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
+from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.core.window import Window
-# Import từ các file header.py và footer.py
 from footer import Footer
 from header import Header
 
-class RoundedTextInput(TextInput):
-    """Tùy chỉnh TextInput để bo góc & đổi màu nền thành xám."""
-    def __init__(self, **kwargs):
+class ImageButton(RelativeLayout):
+    def __init__(self, text, image_source, **kwargs):
         super().__init__(**kwargs)
-        self.background_normal = ''
-        self.background_active = ''
-        self.background_color = (0.9, 0.9, 0.9, 1)  # Màu xám nhạt
-        self.foreground_color = (0, 0, 0, 1)  # Màu chữ đen
-        self.size_hint = (0.8, None)  # Giảm kích thước chiều ngang
-        self.radius = [20, 20, 20, 20]  # Bo tròn góc 20px
+        
+        # Hình ảnh
+        img = Image(
+            source=image_source,
+            size_hint=(1, 1),
+            pos_hint={"center_x": 0.5, "center_y": 0.5}
+        )
+        
+        # Nút bấm
+        btn = Button(
+            text=text,
+            background_normal='',  # Loại bỏ màu nền mặc định
+            background_color=(0, 0, 0, 0.5),  # Làm trong suốt 50%
+            size_hint=(1, 1)
+        )
 
-def is_not_number(value):
-    return not isinstance(value, (int, float))
-    
+        self.add_widget(img)
+        self.add_widget(btn)
+
 class PageScreen(Screen):
     def __init__(self, page_number, screen_manager, **kwargs):
         super().__init__(**kwargs)
-        
-        if(is_not_number(page_number)):
-          self.name = page_number
-        else:
-            self.name = f"page{page_number}"
-            
-        self.page_number = page_number
-        # Layout chính theo chiều dọc
-        main_layout = BoxLayout(orientation="vertical", spacing=10, padding=10)
+        self.name = f"page{page_number}"
 
-                # Thêm header từ file header.py
-        main_layout.add_widget(Header(screen_manager,"Biển Báo"))
-        
-        # Thanh tìm kiếm ở trên cùng với bo tròn
-        # search_layout = BoxLayout(size_hint=(1, None), height=50, padding=[10, 0])
-        # self.search_bar = RoundedTextInput(hint_text="Tìm kiếm...")
-        # search_layout.add_widget(self.search_bar)
-        # main_layout.add_widget(search_layout)
+        main_layout = BoxLayout(orientation="vertical", spacing=10, padding=[20, 20, 20, 20])
 
-        # Layout chứa 5 nút chính (dùng hình ảnh bên trái)
-        button_layout = GridLayout(cols=1, size_hint=(None, None), size=(300, 566))
-        button_layout.pos_hint = {"center_x": 0.5, "center_y": 0.5}
+        # Header
+        main_layout.add_widget(Header(screen_manager, "Biển Báo"))
 
-        # Danh sách hình ảnh (thay bằng đường dẫn hình của bạn)
-        image_paths = ["image\logo.png", "image\logo.png", "image\logo.png", "image\logo.png", "image\logo.png"]
+        # Thanh tìm kiếm
+        search_layout = BoxLayout(size_hint_y=None, height=50)  # Đặt chiều cao cố định
+        search_bar = TextInput(
+            hint_text="Tìm kiếm biển báo...",
+            size_hint=(1, None),
+            height=50
+        )
+        search_layout.add_widget(search_bar)
+        main_layout.add_widget(search_layout)
 
-        for i in range(5):
-            # Layout ngang chứa ảnh + nút
-            btn_layout = BoxLayout(orientation="horizontal", size_hint=(None, None), size=(500, 100))
+        # Lưới chứa các nút có hình ảnh
+        button_grid = GridLayout(
+            cols=2,
+            spacing=20,
+            padding=[0, 20, 0, 20],
+            size_hint_y=None,
+            height=460
+        )
 
-            # Hình ảnh nhỏ
-            img = Image(source=image_paths[i], size_hint=(None, None), size=(100, 100))
+        # Danh sách ảnh mẫu (Bạn có thể thay bằng ảnh thực tế)
+        images = ["image/bg.jpg"]*9
 
-            # Nút (chỉ để hiển thị ảnh và text nếu cần)
-            btn = Button(text=f"Nút {i+1}", size_hint=(None, None), size=(250, 80))
-            btn.bind(on_press=lambda instance, num=i+1: self.open_text_page(num))
+        for i in range(1, 9):
+            img_button = ImageButton(text=f"", image_source=images[i - 1])
+            button_grid.add_widget(img_button)
 
-            btn_layout.add_widget(img)  # Ảnh bên trái
-            btn_layout.add_widget(btn)  # Nút bên phải
+        # Thêm lưới nút vào layout chính
+        main_layout.add_widget(button_grid)
 
-            button_layout.add_widget(btn_layout)
-
-        # Layout chứa nút chuyển trang
-        nav_layout = BoxLayout(size_hint=(1, None), height=50, spacing=10)
-
-        prev_btn = Button(text="Trang Trước", size_hint=(0.5, 1))
-        prev_btn.bind(on_press=self.prev_page)
-
-        next_btn = Button(text="Trang Sau", size_hint=(0.5, 1))
-        next_btn.bind(on_press=self.next_page)
-
-        nav_layout.add_widget(prev_btn)
-        nav_layout.add_widget(next_btn)
-
-        main_layout.add_widget(button_layout)
-        main_layout.add_widget(nav_layout)
+        # Footer
+        main_layout.add_widget(Footer(screen_manager))
 
         self.add_widget(main_layout)
-        
-                # Thêm footer từ file footer.py
-        self.add_widget(Footer(screen_manager))
-
-    def prev_page(self, instance):
-        if self.page_number > 1:
-            self.screen_manager.transition = SlideTransition(direction="right")
-            self.screen_manager.current = f"page{self.page_number - 1}"
-
-    def next_page(self, instance):
-        if self.page_number < 12:
-            self.screen_manager.transition = SlideTransition(direction="left")
-            self.screen_manager.current = f"page{self.page_number + 1}"
-
-    def open_text_page(self, button_number):
-        """Chuyển sang trang hiển thị văn bản."""
-        text_page = self.screen_manager.get_screen("text_screen")
-        text_page.update_text(f"Nội dung của nút {button_number}")
-        self.screen_manager.transition = SlideTransition(direction="left")
-        self.screen_manager.current = "text_screen"
-
-class TextScreen(Screen):
-    """Màn hình hiển thị nội dung khi bấm vào nút."""
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.name = "text_screen"
-
-        layout = BoxLayout(orientation="vertical", padding=20, spacing=10)
-
-        # Nhãn hiển thị nội dung
-        self.label = Label(text="Nội dung sẽ hiển thị ở đây", font_size=24, halign="center", valign="middle", color=(0,0,0,1))
-        layout.add_widget(self.label)
-
-        # Nút quay lại
-        back_button = Button(text="⬅ Quay lại", size_hint=(None, None), size=(200, 50))
-        back_button.bind(on_press=self.go_back)
-        layout.add_widget(back_button)
-
-        self.add_widget(layout)
-
-    def update_text(self, new_text):
-        """Cập nhật nội dung văn bản."""
-        self.label.text = new_text
-
-    def go_back(self, instance):
-        """Quay lại trang trước."""
-        self.manager.transition = SlideTransition(direction="right")
-        self.manager.current = "page1"  # Quay lại trang 1 (hoặc có thể nhớ trang trước đó)
 
 class MyApp(App):
     def build(self):
-        Window.clearcolor = (1, 1, 1, 1)  # Đặt nền trắng
-        
+        Window.clearcolor = (1, 1, 1, 1)
         sm = ScreenManager()
-        # Tạo 5 trang và thêm vào ScreenManager
-        for i in range(1, 6):
-            sm.add_widget(PageScreen(i, sm))
-
-        # Thêm trang hiển thị văn bản
-        sm.add_widget(TextScreen())
-
+        sm.add_widget(PageScreen(1, sm))
         return sm
 
 if __name__ == "__main__":
