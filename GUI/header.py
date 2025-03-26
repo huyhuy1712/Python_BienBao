@@ -91,25 +91,6 @@ class MainScreen(Screen):
 
         self.add_widget(layout)
 
-
-# Màn hình User khi nhấn vào Avatar
-class UserScreen(Screen):
-    def __init__(self, screen_manager, **kwargs):
-        super().__init__(**kwargs)
-        self.screen_manager = screen_manager
-
-        layout = BoxLayout(orientation="vertical", padding=20, spacing=15)
-
-        title = Label(text="Màn hình User", font_size=24, color=(1, 1, 1, 1))
-        layout.add_widget(title)
-
-        # Nút quay lại
-        back_button = Label(text="Quay lại", size_hint_y=None, height=50, color=(1, 0, 0, 1))
-        back_button.bind(on_touch_down=self.go_back)
-        layout.add_widget(back_button)
-
-        self.add_widget(layout)
-
     def go_back(self, instance, touch):
         if instance.collide_point(*touch.pos):
             self.screen_manager.current = "main"
