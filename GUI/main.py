@@ -16,6 +16,7 @@ from lichSu import HistoryScreen
 
 
 
+
 class MainScreen(Screen):
     def __init__(self, screen_manager, **kwargs):
         super().__init__(**kwargs)
@@ -107,6 +108,7 @@ class MyApp(MDApp):
         sm.add_widget(upload_screen) # Thêm màn hình user
         sm.add_widget(history_screen) # Thêm màn hình user
         sm.add_widget(PageScreen('info',sm)) # Thêm màn hình user
+        
 
                 # Thêm các PageScreen vào sm
         for i in range(1, 11):
