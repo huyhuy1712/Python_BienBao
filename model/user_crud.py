@@ -1,3 +1,9 @@
+#Phải import cái này máy t(nam) chạy mới được
+#Dòng này thêm thư mục cha (Python_BienBao) vào sys.path, giúp Python nhận diện package model khi chạy file .py trực tiếp.
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from model.db_connection import get_connection, close_connection
 
 # CREATE - Thêm user mới
@@ -44,3 +50,4 @@ def delete_user(user_id):
         conn.commit()
         close_connection(conn, cursor)
         print("✅ User deleted successfully!")
+
