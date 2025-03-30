@@ -68,7 +68,21 @@ def delete_sign(id_sign: int):
         close_connection(conn, cursor)
         print("✅ Sign deleted successfully!")
 
+def get_all_signs_by_type(type_sign):
+    conn = get_connection()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id_sign, name, image, type, description FROM sign WHERE type = %s", (type_sign,))
+        signs_data = cursor.fetchall()
+        close_connection(conn, cursor)
 
-signs = get_all_signs()
-for sign in signs:
-    print(sign.image)
+        # Chuyển dữ liệu thành danh sách đối tượng Sign
+        return [Sign(*data) for data in signs_data]
+    return []
+
+def get_all_signs_by_keyword(keyword,signs):
+    arr_sign=[]
+    for sign in signs:
+        if keyword in sign.name:
+            arr_sign.append(sign)
+    return arr_sign
