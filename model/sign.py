@@ -44,3 +44,5 @@ class Sign:
     # Hàm hiển thị thông tin biển báo
     def display_info(self) -> str:
         return f"ID: {self.id_sign}, Name: {self.name}, Image: {self.image}, Type: {self.type_sign}, Description: {self.description}"
+    def __str__(self):
+        return f"Sign(id={self.id_sign}, name={self.name}, image={self.image}, type={self.type_sign})"
