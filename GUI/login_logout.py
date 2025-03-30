@@ -272,7 +272,7 @@ class Register(Screen):
         )
         self.add_widget(self.password_input_again)
         
-                        # Nút Đăng ký
+         # Nút Đăng ký
         self.register_btn = Button(
             text="Đăng ký",
             size_hint=(None, None),
