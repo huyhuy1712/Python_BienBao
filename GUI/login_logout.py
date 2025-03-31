@@ -145,6 +145,7 @@ class Login(Screen):
         
         self.password_input = TextInput(
             hint_text="Mật khẩu",
+            password=True,
             size_hint=(None, None),
             size=(400, 50),
             pos_hint={"center_x": 0.5, "center_y": 0.45},
