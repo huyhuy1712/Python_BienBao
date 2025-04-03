@@ -103,10 +103,10 @@ class Main(Screen):
         self.register_btn.bind(on_press=self.go_to_register)
         
     def go_to_login(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "login"  # Chuyển sang màn hình đăng nhập
     def go_to_register(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "register"  # Chuyển sang màn hình đăng ky            
 
 
@@ -201,10 +201,10 @@ class Login(Screen):
         self.back_main.bind(on_press=self.back_to_main)
         
     def back_to_main(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="right")  # Hiệu ứng trượt sang trái
         self.manager.current = "modau"  # Chuyển sang màn hình chính
     def go_to_register(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "register"  # Chuyển sang màn hình đăng ky 
      
     def login_user(self, instance):
@@ -366,10 +366,10 @@ class Register(Screen):
         self.back_main.bind(on_press=self.back_to_main)
         
     def back_to_main(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="right")  # Hiệu ứng trượt sang trái
         self.manager.current = "modau"  # Chuyển sang màn hình chính
     def go_to_login(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "login"  # Chuyển sang màn hình đăng nhập
     #tải ảnh lên
     def open_file_chooser(self, instance):
