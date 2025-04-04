@@ -13,6 +13,9 @@ from uploadAnh import UploadScreen
 from user import EditProfileScreen
 from inf_signs import PageScreen
 from lichSu import HistoryScreen
+from login_logout import Main
+from login_logout import Login
+from login_logout import Register
 
 
 
@@ -85,6 +88,9 @@ class MyApp(MDApp):
     def build(self):
         sm = ScreenManager()
         
+        modau_screen = Main(sm, name='modau')
+        login_screen = Login(sm, name='login')
+        register_screen = Register(sm, name='register')
         # Tạo MainScreen và truyền screen_manager
         main_screen = MainScreen(sm, name='main')
         # Tạo ScanScreen và truyền Header
@@ -93,6 +99,8 @@ class MyApp(MDApp):
         upload_screen = UploadScreen(sm,name='upload')
         # Tạo UploadScreen truyền vào ScreenManager
         history_screen = HistoryScreen(sm,name='history')
+        
+        sign_screen = PageScreen(sm,name='info')
 
 
 
@@ -101,20 +109,22 @@ class MyApp(MDApp):
         user_screen = Screen(name='user')
         user_screen.add_widget(EditProfileScreen(sm))
         
-
+        sm.add_widget(modau_screen)  # Thêm màn hình đăng nhập
+        sm.add_widget(login_screen)  # Thêm màn hình đăng nhập
+        sm.add_widget(register_screen)  # Thêm màn hình đăng nhập
         sm.add_widget(main_screen)  # Thêm màn hình chính
         sm.add_widget(scan_screen)  # Thêm màn hình Scan
         sm.add_widget(user_screen) # Thêm màn hình user
+        sm.add_widget(sign_screen) # Thêm màn hình sign
         sm.add_widget(upload_screen) # Thêm màn hình user
         sm.add_widget(history_screen) # Thêm màn hình user
-        sm.add_widget(PageScreen('info',sm)) # Thêm màn hình user
         
 
-                # Thêm các PageScreen vào sm
-        for i in range(1, 11):
-            sm.add_widget(PageScreen(i,sm))
+
             
         print("Danh sách màn hình trong ScreenManager:", sm.screen_names)
+        
+        sm.current = "modau"  # Mở ứng dụng với màn hình đăng nhập
 
 
         return sm  # Đảm bảo ScreenManager là root

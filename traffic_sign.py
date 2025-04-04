@@ -4,9 +4,9 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
 from keras.models import Model
-from keras.layers import Dense, Flatten, Dropout, BatchNormalization, GlobalAveragePooling2D
+from keras.layers import Dense, Dropout, GlobalAveragePooling2D
 from keras.applications import MobileNetV2
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import EarlyStopping
 import os
 
@@ -25,7 +25,7 @@ for i in range(classes):
             image = Image.open(os.path.join(path, a)).convert('RGB')
             image = image.resize((100, 100))
             image = np.array(image)
-
+            
             if image.shape == (100, 100, 3):
                 data.append(image)
                 labels.append(i)
@@ -35,7 +35,7 @@ for i in range(classes):
             print(f"Error loading image {a}: {e}")
 
 # 🔹 **Chuyển danh sách thành mảng numpy và chuẩn hóa dữ liệu**
-data = np.array(data) / 255.0  # Đưa pixel về khoảng [0,1]
+data = np.array(data, dtype=np.float32) / 255.0  # Đưa pixel về khoảng [0,1]
 labels = np.array(labels)
 
 # 🔹 **Chia tập dữ liệu train/test**
@@ -55,9 +55,9 @@ datagen = ImageDataGenerator(
     horizontal_flip=True,
     fill_mode='nearest'
 )
-datagen.fit(X_train)
 
-# 🔹 **Sử dụng Transfer Learning (MobileNetV2)**
+
+# 🔹 **Dùng Transfer Learning (MobileNetV2)**
 base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(100, 100, 3))
 
 # 🔹 **Thêm các lớp Fully Connected**
@@ -72,7 +72,7 @@ x = Dense(classes, activation='softmax')(x)
 # 🔹 **Tạo mô hình mới**
 model = Model(inputs=base_model.input, outputs=x)
 
-# 🔹 **Đóng băng các lớp của MobileNetV2 để giữ trọng số đã học**
+# 🔹 **Đóng băng các lớp của MobileNetV2**
 for layer in base_model.layers:
     layer.trainable = False
 
@@ -82,10 +82,12 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 # 🔹 **Early Stopping để tránh overfitting**
 early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
 
-# 🔹 **Huấn luyện mô hình**
-epochs = 50  # Có thể tăng lên nếu cần
-history = model.fit(datagen.flow(X_train, y_train, batch_size=64),
-                    epochs=epochs,
+# 🔹 **Huấn luyện mô hình bằng generator để tiết kiệm RAM**
+batch_size = 64
+train_generator = datagen.flow(X_train, y_train, batch_size=batch_size)
+
+history = model.fit(train_generator,
+                    epochs=100,
                     validation_data=(X_test, y_test),
                     callbacks=[early_stopping])
 
@@ -124,5 +126,4 @@ plt.ylabel('Loss')
 plt.legend()
 plt.savefig(os.path.join(graph_dir, 'loss.png'))
 plt.close()
-
 print(f"Graphs saved in: {graph_dir}")
