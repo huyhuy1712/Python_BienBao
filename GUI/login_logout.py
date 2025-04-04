@@ -222,10 +222,10 @@ class Login(Screen):
                 host="localhost",
                 user="root",
                 password="",
-                database="kivy_app"
+                database="bienbao"
             )
             cursor = conn.cursor()
-            query = "SELECT * FROM users WHERE username = %s AND password = %s"
+            query = "SELECT * FROM user WHERE username = %s AND password = %s"
             cursor.execute(query, (username,password))
             user = cursor.fetchone()
 
@@ -404,10 +404,10 @@ class Register(Screen):
                 host="localhost",
                 user="root",
                 password="",
-                database="kivy_app"
+                database="bienbao"
             )
             cursor = conn.cursor()
-            query = "INSERT INTO users (username, password, avatar) VALUES (%s, %s, %s)"
+            query = "INSERT INTO user (username, password, avatar) VALUES (%s, %s, %s)"
             cursor.execute(query, (username, password, avatar_path))
             conn.commit()
             cursor.close()
