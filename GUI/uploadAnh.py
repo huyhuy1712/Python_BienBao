@@ -73,7 +73,7 @@ class UploadScreen(BoxLayout, Screen):
         self.screen_manager = screen_manager
         
         # Load model
-        self.model = load_model("./models_train/my_model4.keras")  # Thay đổi file model nếu cần
+        self.model = load_model("./models_train/my_model2.keras")  # Thay đổi file model nếu cần
         self.classes = [f"Class {i}" for i in range(43)]  # Danh sách các class, cần cập nhật đúng
 
         # Header
