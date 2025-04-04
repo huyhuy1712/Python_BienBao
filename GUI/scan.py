@@ -12,7 +12,7 @@ import cv2
 from kivy.uix.label import Label
 
 
-model = load_model("models_train/my_model2.keras")  
+model = load_model("models_train/my_model4.keras")  
 
 # Import từ các file header.py và footer.py
 from footer import Footer
