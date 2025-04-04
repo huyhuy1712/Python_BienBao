@@ -1,4 +1,4 @@
-from model.db_connection import get_connection, close_connection
+from db_connection import get_connection, close_connection
 
 # CREATE - Thêm user mới
 def create_user(username, password, avatar):
@@ -44,3 +44,4 @@ def delete_user(user_id):
         conn.commit()
         close_connection(conn, cursor)
         print("✅ User deleted successfully!")
+
