@@ -12,6 +12,9 @@ from kivy.graphics import Color, RoundedRectangle
 from kivy.uix.button import Button
 from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.popup import Popup
+import mysql.connector
+from mysql.connector import Error
+
 
 class RoundedButton(Button):
     def __init__(self, **kwargs):
@@ -43,9 +46,9 @@ class RoundedButton(Button):
         self.rect.size = self.size
 
 class Main(Screen):
-    def __init__(self, **kwargs):
+    def __init__(self,screen_manager, **kwargs):
         super().__init__(**kwargs)
-
+        self.screen_manager = screen_manager
         #layout = BoxLayout(orientation= 'vertical')
         #Thêm hình nền (background)
         self.bg = Image(
@@ -100,18 +103,18 @@ class Main(Screen):
         self.register_btn.bind(on_press=self.go_to_register)
         
     def go_to_login(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "login"  # Chuyển sang màn hình đăng nhập
     def go_to_register(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "register"  # Chuyển sang màn hình đăng ky            
 
 
 
 class Login(Screen):
-    def __init__(self, **kwargs):
+    def __init__(self,screen_manager, **kwargs):
         super().__init__(**kwargs)
-
+        self.screen_manager = screen_manager
         # Thêm hình nền (background)
         self.bg = Image(
             source="image/bg.jpg",  # Đổi thành đường dẫn ảnh của bạn
@@ -142,6 +145,7 @@ class Login(Screen):
         
         self.password_input = TextInput(
             hint_text="Mật khẩu",
+            password=True,
             size_hint=(None, None),
             size=(400, 50),
             pos_hint={"center_x": 0.5, "center_y": 0.45},
@@ -161,6 +165,7 @@ class Login(Screen):
             pos_hint={'center_x':0.5 , 'y':0.28 },
         )
         self.add_widget(self.login_btn)
+        self.login_btn.bind(on_press=self.login_user)
         
         self.label = Label(
             text="Nếu bạn chưa có tài khoản bấm đăng ký!", 
@@ -196,15 +201,57 @@ class Login(Screen):
         self.back_main.bind(on_press=self.back_to_main)
         
     def back_to_main(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
-        self.manager.current = "main"  # Chuyển sang màn hình chính
+        self.manager.transition = SlideTransition(direction="right")  # Hiệu ứng trượt sang trái
+        self.manager.current = "modau"  # Chuyển sang màn hình chính
     def go_to_register(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "register"  # Chuyển sang màn hình đăng ky 
-        
+     
+    def login_user(self, instance):
+        username = self.username_input.text.strip()
+        password = self.password_input.text.strip()
+
+        if not username or not password:
+            self.show_popup("Lỗi", "Vui lòng nhập tài khoản và mật khẩu!")
+            return
+
+        #hashed_password = hashlib.sha256(password.encode()).hexdigest()  # Mã hóa mật khẩu
+
+        try:
+            conn = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="",
+                database="bienbao"
+            )
+            cursor = conn.cursor()
+            query = "SELECT * FROM user WHERE username = %s AND password = %s"
+            cursor.execute(query, (username,password))
+            user = cursor.fetchone()
+
+            cursor.close()
+            conn.close()
+
+            if user:
+                self.show_popup("Thành công", "Đăng nhập thành công!")
+                if self.manager:  # Kiểm tra nếu có ScreenManager
+                    self.manager.current = "main"
+                else:
+                    print("Lỗi: Không tìm thấy ScreenManager!") # Chuyển về màn hình chính hoặc màn hình người dùng
+            else:
+                self.show_popup("Lỗi", "Tài khoản hoặc mật khẩu không đúng!")
+
+        except Error as e:
+            self.show_popup("Lỗi", f"Lỗi kết nối CSDL: {e}")
+
+    def show_popup(self, title, message):
+        popup = Popup(title=title, content=Label(text=message), size_hint=(0.6, 0.4))
+        popup.open()      
 class Register(Screen):
-    def __init__(self, **kwargs):
+    def __init__(self,screen_manager, **kwargs):
         super().__init__(**kwargs)
+        self.screen_manager = screen_manager
+
         # Thêm hình nền (background)
         self.bg = Image(
             source="image/bg.jpg",  # Đổi thành đường dẫn ảnh của bạn
@@ -252,6 +299,7 @@ class Register(Screen):
         
         self.password_input = TextInput(
             hint_text="Mật khẩu",
+            password=True,
             size_hint=(None, None),
             size=(400, 50),
             pos_hint={"center_x": 0.5, "center_y": 0.40},
@@ -261,8 +309,9 @@ class Register(Screen):
         )
         self.add_widget(self.password_input)
         
-        self.password_input_again = TextInput(
+        self.confirm_password = TextInput(
             hint_text="Xác nhận Mật khẩu",
+            password=True,
             size_hint=(None, None),
             size=(400, 50),
             pos_hint={"center_x": 0.5, "center_y": 0.33},
@@ -270,9 +319,9 @@ class Register(Screen):
             multiline=False,
             padding=[10, 10],
         )
-        self.add_widget(self.password_input_again)
+        self.add_widget(self.confirm_password)
         
-                        # Nút Đăng ký
+         # Nút Đăng ký
         self.register_btn = Button(
             text="Đăng ký",
             size_hint=(None, None),
@@ -282,6 +331,7 @@ class Register(Screen):
             pos_hint={'center_x':0.5 , 'y':0.18 }
         )
         self.add_widget(self.register_btn)
+        self.register_btn.bind(on_press=self.register_user)
         
                 # Nút Đăng nhập
         self.login_btn = Button(
@@ -316,10 +366,10 @@ class Register(Screen):
         self.back_main.bind(on_press=self.back_to_main)
         
     def back_to_main(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
-        self.manager.current = "main"  # Chuyển sang màn hình chính
+        self.manager.transition = SlideTransition(direction="right")  # Hiệu ứng trượt sang trái
+        self.manager.current = "modau"  # Chuyển sang màn hình chính
     def go_to_login(self, instance):
-        self.manager.translate = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
+        self.manager.transition = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "login"  # Chuyển sang màn hình đăng nhập
     #tải ảnh lên
     def open_file_chooser(self, instance):
@@ -330,15 +380,53 @@ class Register(Screen):
             if selection:
                 self.avatar.source = selection[0]  # Hiển thị ảnh đã chọn
                 popup.dismiss()
-
         content.bind(on_submit=select_file)
         popup.open()
+        
+    def register_user(self, instance):
+        username = self.username_input.text.strip()
+        password = self.password_input.text.strip()
+        confirm_password = self.confirm_password.text.strip()
+        avatar_path = self.avatar.source if self.avatar.source else ""
 
-class MyApp(App):
+        if not username or not password or not confirm_password:
+            self.show_popup("Lỗi", "Vui lòng điền đầy đủ thông tin!")
+            return
+
+        if password != confirm_password:
+            self.show_popup("Lỗi", "Mật khẩu xác nhận không khớp!")
+            return
+
+        #hashed_password = hashlib.sha256(password.encode()).hexdigest()  # Mã hóa mật khẩu
+
+        try:
+            conn = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="",
+                database="bienbao"
+            )
+            cursor = conn.cursor()
+            query = "INSERT INTO user (username, password, avatar) VALUES (%s, %s, %s)"
+            cursor.execute(query, (username, password, avatar_path))
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            self.show_popup("Thành công", "Đăng ký thành công!")
+            self.manager.current = "login"  # Chuyển sang màn hình đăng nhập
+
+        except Error as e:
+            self.show_popup("Lỗi", f"Lỗi kết nối CSDL: {e}")
+
+    def show_popup(self, title, message):
+        popup = Popup(title=title, content=Label(text=message), size_hint=(0.6, 0.4))
+        popup.open()
+    
+class MyApp(App):   
     def build(self):
-        Window.size=(500,700)
         sm = ScreenManager()
-        sm.add_widget(Main(name="main"))
+        sm.add_widget(Main(name="modau"))
         sm.add_widget(Login(name="login"))
         sm.add_widget(Register(name="register"))
         return sm
