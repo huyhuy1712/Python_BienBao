@@ -18,6 +18,11 @@ model = load_model("models_train/my_model4.keras")
 from footer import Footer
 from header import Header
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from model.user_crud import *
+
 classes = {
     0: 'Giới hạn tốc độ (20km/h)\nBáo hiệu giới hạn tốc độ tối đa cho phép là 20km/h.',
     1: 'Giới hạn tốc độ (30km/h)\nBáo hiệu giới hạn tốc độ tối đa cho phép là 30km/h.',
@@ -73,7 +78,8 @@ class ScanScreen(Screen):
         self.main_layout = BoxLayout(orientation='vertical')
         self.screen_manager = screen_manager
         # Thêm header
-        self.main_layout.add_widget(Header(screen_manager, "Scan Ảnh"))
+        user_id = load_user_id()
+        self.main_layout.add_widget(Header(screen_manager,user_id, "Scan Ảnh"))
 
         # Layout nội dung giữa
         self.content_layout = BoxLayout(orientation='vertical', padding=[20, 20], spacing=20)

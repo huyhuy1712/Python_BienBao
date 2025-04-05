@@ -19,6 +19,11 @@ from kivy.uix.label import Label
 from footer import Footer
 from header import Header
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from model.user_crud import *
+
 
 classes = {
     0: 'Giới hạn tốc độ (20km/h)\nBáo hiệu giới hạn tốc độ tối đa cho phép là 20km/h.',
@@ -77,7 +82,8 @@ class UploadScreen(BoxLayout, Screen):
         self.classes = [f"Class {i}" for i in range(43)]  # Danh sách các class, cần cập nhật đúng
 
         # Header
-        self.add_widget(Header(screen_manager, "Upload Ảnh"))
+        user_id = load_user_id()
+        self.add_widget(Header(screen_manager,user_id, "Upload Ảnh"))
 
         # **KHU VỰC HÌNH ẢNH**
         self.image_container = BoxLayout(size_hint=(0.85, 0.5), pos_hint={'center_x': 0.5})
