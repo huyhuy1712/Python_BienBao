@@ -37,8 +37,22 @@ def get_history_data():
     finally:
         close_connection(conn, cursor)
 
-if __name__ == "__main__":
-    data = get_history_data()
-    if data:
-        for row in data:
-            print(row)
+def add_history(id_user, type, image, description):
+    conn = get_connection()
+    if conn is None:
+        print("Không thể kết nối đến cơ sở dữ liệu.")
+        return None
+    else:
+        try:
+            cursor = conn.cursor()
+            query = "INSERT INTO history (id_user, id_sign, type, image, description) VALUES (%s, %s, %s, %s, %s)"
+            cursor.execute(query, (id_user, 1, type, image, description))
+            conn.commit()
+            print("Đã thêm lịch sử thành công.")
+        except Exception as e:
+            print(f"Lỗi khi thêm lịch sử: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+
+    
