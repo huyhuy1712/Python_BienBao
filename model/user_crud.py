@@ -153,4 +153,40 @@ def get_avatar_by_id(user_id):
     else:
         return None  # Nếu không kết nối được đến cơ sở dữ liệu   
 
+def get_user_by_id(user_id):
+    conn = get_connection()
+    if conn:
+        try:
+            cursor = conn.cursor(dictionary=True)  # Dùng dict để truy cập theo tên cột
+            sql = "SELECT * FROM user WHERE id_user = %s"
+            cursor.execute(sql, (user_id,))
+            user = cursor.fetchone()
+            return user  # Trả về dict hoặc None nếu không có
+        except Exception as e:
+            print("Lỗi khi truy vấn user:", e)
+        finally:
+            cursor.close()
+            conn.close()
+    return None
 
+
+def save_user_id(user_id):
+    with open("curr_user.txt","w") as file:
+        file.write(user_id)
+
+def load_user_id():
+    try:
+        with open("curr_user.txt", "r") as file:
+            id_user = file.read().strip()
+            return id_user
+    except FileNotFoundError:
+        print("File curr_user.txt không tồn tại.")
+        return None
+
+def is_avatar_exist(avatar_name, folder="image/"):
+    """Kiểm tra xem ảnh có tồn tại trong thư mục hay không."""
+    if not avatar_name:  # Nếu avatar_name rỗng hoặc None, trả về False
+        return False
+
+    avatar_path = os.path.join(folder, avatar_name.strip())  # Tạo đường dẫn đầy đủ
+    return os.path.isfile(avatar_path)  # Trả về True nếu file tồn tại, ngược lại False
