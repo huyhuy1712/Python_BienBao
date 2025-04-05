@@ -1,7 +1,4 @@
-from kivy.app import App
-from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
-from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.widget import Widget
@@ -13,7 +10,17 @@ from kivy.uix.button import Button
 from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.popup import Popup
 import mysql.connector
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from model.user_crud import *
 from mysql.connector import Error
+from scan import ScanScreen
+from uploadAnh import UploadScreen
+from user import EditProfileScreen
+from inf_signs import PageScreen
+from lichSu import HistoryScreen
+from trangchu import MainScreen
 
 
 class RoundedButton(Button):
@@ -40,6 +47,7 @@ class RoundedButton(Button):
         if 'background_color' in self.__dict__:
             return self.background_color
         return (0.2, 0.6, 1, 1)  # Mặc định màu xanh dương
+
 
     def update_rect(self, *args):
         self.rect.pos = self.pos
@@ -108,7 +116,6 @@ class Main(Screen):
     def go_to_register(self, instance):
         self.manager.transition = SlideTransition(direction="left")  # Hiệu ứng trượt sang trái
         self.manager.current = "register"  # Chuyển sang màn hình đăng ky            
-
 
 
 class Login(Screen):
@@ -234,19 +241,45 @@ class Login(Screen):
 
             if user:
                 self.show_popup("Thành công", "Đăng nhập thành công!")
-                if self.manager:  # Kiểm tra nếu có ScreenManager
+                user_id = user[0]
+                save_user_id(str(user_id)) #lưu user id vừa mới đọc
+                
+                #tao moi screen manager
+                # Tạo MainScreen và truyền screen_manager
+                main_screen = MainScreen(self.screen_manager, name='main')
+                # Tạo ScanScreen và truyền Header
+                scan_screen = ScanScreen(self.screen_manager, name='scan')
+                # Tạo UploadScreen truyền vào ScreenManager
+                upload_screen = UploadScreen(self.screen_manager,name='upload')
+                # Tạo UploadScreen truyền vào ScreenManager
+                history_screen = HistoryScreen(self.screen_manager,name='history')
+                sign_screen = PageScreen(self.screen_manager,name='info')
+                        # Tạo màn hình User
+                user_screen = Screen(name='user')
+                user_screen.add_widget(EditProfileScreen(self.screen_manager))
+                
+                self.screen_manager.add_widget(main_screen)  # Thêm màn hình chính
+                self.screen_manager.add_widget(scan_screen)  # Thêm màn hình Scan
+                self.screen_manager.add_widget(user_screen) # Thêm màn hình user
+                self.screen_manager.add_widget(sign_screen) # Thêm màn hình sign
+                self.screen_manager.add_widget(upload_screen) # Thêm màn hình upload    
+                self.screen_manager.add_widget(history_screen) # Thêm màn hình lịch sử 
+                
+                if self.manager:  # Kiem tra neu co ScreenManager
                     self.manager.current = "main"
                 else:
-                    print("Lỗi: Không tìm thấy ScreenManager!") # Chuyển về màn hình chính hoặc màn hình người dùng
+                    print("Loi: Khong tim thay ScreenManager!") 
             else:
-                self.show_popup("Lỗi", "Tài khoản hoặc mật khẩu không đúng!")
+                self.show_popup("Loi", "Tai khoan hoac mat khau khong đung!")
 
         except Error as e:
-            self.show_popup("Lỗi", f"Lỗi kết nối CSDL: {e}")
+            self.show_popup("Loi", f"Loi ket noi CSDL: {e}")
 
     def show_popup(self, title, message):
         popup = Popup(title=title, content=Label(text=message), size_hint=(0.6, 0.4))
         popup.open()      
+        
+        
 class Register(Screen):
     def __init__(self,screen_manager, **kwargs):
         super().__init__(**kwargs)
@@ -423,14 +456,4 @@ class Register(Screen):
         popup = Popup(title=title, content=Label(text=message), size_hint=(0.6, 0.4))
         popup.open()
     
-class MyApp(App):   
-    def build(self):
-        sm = ScreenManager()
-        sm.add_widget(Main(name="modau"))
-        sm.add_widget(Login(name="login"))
-        sm.add_widget(Register(name="register"))
-        return sm
 
-
-if __name__ == "__main__":
-    MyApp().run()

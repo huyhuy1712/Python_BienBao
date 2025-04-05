@@ -23,6 +23,11 @@ from kivymd.uix.pickers import MDDatePicker
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.textfield import MDTextField
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from model.user_crud import *
+
 from model.history_crud import get_history_data
 
 try:
@@ -68,7 +73,8 @@ class HistoryScreen(BoxLayout, Screen):
         self.screen_manager = screen_manager
         self.md_bg_color = (1, 1, 1, 1)
 
-        self.add_widget(Header(screen_manager, "Lịch Sử"))
+        user_id = load_user_id()
+        self.add_widget(Header(screen_manager,user_id, "Lịch Sử"))
 
         # Thanh tìm kiếm
         search_layout = BoxLayout(size_hint=(1, 0.16), spacing=5,padding=10)

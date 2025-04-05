@@ -20,6 +20,11 @@ from kivy.uix.label import Label
 from model.sign_crud import *
 from model.sign import *
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from model.user_crud import *
+
 class ImageButton(RelativeLayout):
     def __init__(self, id_sign, image_source, **kwargs):
         super().__init__(**kwargs)
@@ -90,7 +95,8 @@ class PageScreen(Screen):
         main_layout = BoxLayout(orientation="vertical", spacing=10, padding=[20, 20, 20, 20])
 
         # Header
-        main_layout.add_widget(Header(screen_manager, "Biển Báo"))
+        user_id = load_user_id()
+        main_layout.add_widget(Header(screen_manager,user_id, "Biển Báo"))
 
         # Thanh tìm kiếm
         self.search_layout = BoxLayout(orientation="horizontal", size_hint_y=None, height=50, spacing=10) 
