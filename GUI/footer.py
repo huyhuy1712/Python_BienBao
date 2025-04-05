@@ -7,6 +7,8 @@ from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
 
 
+
+
 class Footer(BoxLayout):
     def __init__(self, screen_manager, **kwargs):
         super().__init__(size_hint=(1, 0.12), padding=[10, 10, 10, 5], spacing=10, **kwargs)  # Tăng padding bottom
@@ -56,6 +58,17 @@ class Footer(BoxLayout):
             print(" Lỗi: Không tìm thấy màn hình 'main'")
 
     def logout(self, instance):
+        if self.screen_manager:
+            self.screen_manager.remove_widget(self.screen_manager.get_screen("main"))
+            self.screen_manager.remove_widget(self.screen_manager.get_screen("scan"))
+            self.screen_manager.remove_widget(self.screen_manager.get_screen("upload"))
+            self.screen_manager.remove_widget(self.screen_manager.get_screen("history"))
+            self.screen_manager.remove_widget(self.screen_manager.get_screen("info"))
+            self.screen_manager.remove_widget(self.screen_manager.get_screen("user"))
+            
+            
+            
+            self.screen_manager.current = 'modau'
         print("Đăng xuất khỏi ứng dụng")
       
 
@@ -67,3 +80,6 @@ class MyApp(MDApp):
 
 if __name__ == "__main__":
     MyApp().run()
+
+
+
