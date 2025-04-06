@@ -7,10 +7,15 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.graphics import Color, Rectangle, RoundedRectangle
 from tensorflow.keras.models import load_model
+from datetime import datetime
 import numpy as np
 import cv2
 from kivy.uix.label import Label
-
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from model.user_crud import *
+from model.history_crud import *
 
 model = load_model("models_train/my_model4.keras")  
 
@@ -187,7 +192,7 @@ class ScanScreen(Screen):
             texture = self.camera.texture
             size = texture.size
             pixels = texture.pixels
-
+            
             # Chuyển đổi ảnh từ texture của Kivy sang OpenCV
             img = np.frombuffer(pixels, dtype=np.uint8).reshape(size[1], size[0], 4)
             img = cv2.cvtColor(img, cv2.COLOR_RGBA2RGB)
@@ -205,5 +210,32 @@ class ScanScreen(Screen):
             # Lấy tên biển báo từ classes
             result_text = f"Biển báo nhận diện: {classes.get(predicted_class, 'Không xác định')}"
             self.result_label.text = result_text  # Hiển thị trên giao diện
-
             
+            # Lưu ảnh đã scan vào folder
+            img_path = str(self.save_image(img,"image/img_scan_upload"))
+            user_id = str(load_user_id())
+            description = "Kết quả: " + str(result_text)
+            add_history(user_id,2,img_path,description) #thêm vào lịch sử
+            
+
+    def save_image(self,image, folder_path, filename_prefix="capture"):
+        # Tạo folder nếu chưa tồn tại
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        # Tạo tên file theo thời gian
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{filename_prefix}_{timestamp}.png"
+        file_path = os.path.join(folder_path, filename)
+
+        # Lưu ảnh bằng OpenCV
+        success = cv2.imwrite(file_path, image)
+        
+        if success:
+            print(f"Ảnh đã được lưu tại: {file_path}")
+            return filename
+        else:
+            print("Lỗi khi lưu ảnh.")
+            return None
+            
+

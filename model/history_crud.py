@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import datetime
 
 # Lấy thư mục chứa file history_crud.py (tức là model)
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -45,8 +46,9 @@ def add_history(id_user, type, image, description):
     else:
         try:
             cursor = conn.cursor()
-            query = "INSERT INTO history (id_user, id_sign, type, image, description) VALUES (%s, %s, %s, %s, %s)"
-            cursor.execute(query, (id_user, 1, type, image, description))
+            query = "INSERT INTO history (id_user, id_sign, type, time, image, description) VALUES (%s, %s, %s, %s, %s, %s)"
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            cursor.execute(query, (id_user, 1, type, timestamp, image, description))
             conn.commit()
             print("Đã thêm lịch sử thành công.")
         except Exception as e:
