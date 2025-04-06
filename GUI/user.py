@@ -16,7 +16,6 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import shutil
 from model.user_crud import *
-
 class EditProfileScreen(BoxLayout):
     def __init__(self,screen_manager, **kwargs):
         super().__init__(orientation='vertical', spacing=10, padding=0, size_hint=(1, 1), **kwargs)
@@ -165,5 +164,4 @@ class EditProfileApp(App):
         return EditProfileScreen(sm)
 
 if __name__ == "__main__":
-
     EditProfileApp().run()

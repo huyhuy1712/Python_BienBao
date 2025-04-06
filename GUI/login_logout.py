@@ -25,7 +25,6 @@ from lichSu import HistoryScreen
 from trangchu import MainScreen
 
 
-
 class RoundedButton(Button):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
