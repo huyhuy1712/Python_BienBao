@@ -4,9 +4,8 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.image import Image
-from kivy.uix.filechooser import FileChooserIconView
 from kivy.uix.popup import Popup
-from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.uix.screenmanager import  ScreenManager
 from kivy.graphics import Color, RoundedRectangle
 from footer import Footer
 from kivy.uix.filechooser import FileChooserListView
