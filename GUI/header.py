@@ -6,6 +6,10 @@ from kivy.uix.button import ButtonBehavior
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.graphics import Color, RoundedRectangle, Ellipse, StencilPush, StencilPop, StencilUse, StencilUnUse, Line
 from kivymd.app import MDApp
+<<<<<<< HEAD
+from user import EditProfileScreen
+=======
+>>>>>>> 7cc1353ca30d8370aa6e6b4d4c15c8524ea21ad5
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -37,6 +41,16 @@ class CircularImage(ButtonBehavior, Widget):
     def on_press(self):
         # print("Avatar được nhấn, chuyển sang màn hình user")
         if self.screen_manager:
+<<<<<<< HEAD
+            
+            self.screen_manager.remove_widget(self.screen_manager.get_screen("user"))
+            
+            user_screen = Screen(name='user')
+            user_screen.add_widget(EditProfileScreen(self.screen_manager))
+            self.screen_manager.add_widget(user_screen)
+
+=======
+>>>>>>> 7cc1353ca30d8370aa6e6b4d4c15c8524ea21ad5
             self.screen_manager.current = 'user'
 
     def update_graphics(self, *args):

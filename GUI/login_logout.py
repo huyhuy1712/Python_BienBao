@@ -10,8 +10,10 @@ from kivy.uix.button import Button
 from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.popup import Popup
 import mysql.connector
+import re
 import sys
 import os
+import shutil
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from model.user_crud import *
 from mysql.connector import Error
@@ -284,7 +286,7 @@ class Register(Screen):
     def __init__(self,screen_manager, **kwargs):
         super().__init__(**kwargs)
         self.screen_manager = screen_manager
-
+        
         # Thêm hình nền (background)
         self.bg = Image(
             source="image/bg.jpg",  # Đổi thành đường dẫn ảnh của bạn
@@ -303,6 +305,7 @@ class Register(Screen):
         self.add_widget(self.img)
         
         self.avatar = Image(
+            source="image\default.jpg",
             size_hint=(None,None),
             size=(100,100),
             pos_hint={'center_x':0.26 , 'center_y':0.58 },
@@ -313,8 +316,8 @@ class Register(Screen):
         upload_button = Button(
             text="Chọn ảnh", 
             size_hint=(None, None), 
-            size=(200, 50),
-            pos_hint={'center_x': 0.55, 'center_y':0.58 }
+            size=(100, 50),
+            pos_hint={'center_x': 0.4, 'center_y':0.58 }
             )
         upload_button.bind(on_press=self.open_file_chooser)
         self.add_widget(upload_button)
@@ -329,6 +332,8 @@ class Register(Screen):
             padding=[10, 10],
         )
         self.add_widget(self.username_input)
+    
+
         
         self.password_input = TextInput(
             hint_text="Mật khẩu",
@@ -411,8 +416,15 @@ class Register(Screen):
 
         def select_file(instance, selection, *args):
             if selection:
+                file_name = os.path.basename(selection[0])
+                self.avatar_path = str(file_name)
+            # Kiểm tra định dạng file
+            if file_name.lower().endswith(('.png', '.jpg')):
                 self.avatar.source = selection[0]  # Hiển thị ảnh đã chọn
                 popup.dismiss()
+            else:
+                # Nếu file không phải .png hoặc .jpg, hiển thị thông báo lỗi
+                    self.show_popup("Lỗi", "Chỉ được chọn file có định dạng .png hoặc .jpg")              
         content.bind(on_submit=select_file)
         popup.open()
         
@@ -420,15 +432,24 @@ class Register(Screen):
         username = self.username_input.text.strip()
         password = self.password_input.text.strip()
         confirm_password = self.confirm_password.text.strip()
-        avatar_path = self.avatar.source if self.avatar.source else ""
-
+        avatar_path = os.path.basename(self.avatar.source) if self.avatar.source else "default.jpg"
+        
+      
         if not username or not password or not confirm_password:
             self.show_popup("Lỗi", "Vui lòng điền đầy đủ thông tin!")
             return
-
+        if (len(username) > 20):
+            self.show_popup("Lỗi", "Username chỉ được tối đa 20 kí tự!")
+            return
+        if not self.check_password(password):
+            return
         if password != confirm_password:
             self.show_popup("Lỗi", "Mật khẩu xác nhận không khớp!")
             return
+        if is_username_exist(str(username)):
+            self.show_popup("Lỗi", "Tên người dùng đã được đăng kí!")
+            return
+
 
         #hashed_password = hashlib.sha256(password.encode()).hexdigest()  # Mã hóa mật khẩu
 
@@ -447,6 +468,8 @@ class Register(Screen):
             conn.close()
 
             self.show_popup("Thành công", "Đăng ký thành công!")
+            self.move_image_to_folder(self.avatar.source,"D:\Python-SBD_116\Python_BienBao\image") # chuyển avatar sang thư mục image
+
             self.manager.current = "login"  # Chuyển sang màn hình đăng nhập
 
         except Error as e:
@@ -455,5 +478,38 @@ class Register(Screen):
     def show_popup(self, title, message):
         popup = Popup(title=title, content=Label(text=message), size_hint=(0.6, 0.4))
         popup.open()
+        
     
+    def check_password(self, password):
+    # Kiểm tra độ dài mật khẩu
+        if len(password) != 5:
+            self.show_popup("Lỗi", "Mật khẩu phải có đúng 5 kí tự")
+            return False
+        
+        # Kiểm tra có ít nhất một chữ cái và một số
+        if not re.search(r'[a-zA-Z]', password) or not re.search(r'[0-9]', password):
+            self.show_popup("Lỗi", "Mật khẩu phải có chứ cả chữ và số")
+            return False
+        
+        return True
 
+    def move_image_to_folder(self,source_path, destination_folder):
+        # Kiểm tra xem file nguồn có tồn tại hay không
+        if not os.path.exists(source_path):
+            print(f"File nguồn không tồn tại: {source_path}")
+            return
+
+        # Kiểm tra nếu thư mục đích không tồn tại thì tạo mới
+        if not os.path.exists(destination_folder):
+            os.makedirs(destination_folder)
+
+        # Lấy tên file từ đường dẫn nguồn
+        file_name = os.path.basename(source_path)
+        
+        # Xác định đường dẫn đích đầy đủ
+        destination_path = os.path.join(destination_folder, file_name)
+        
+        # Di chuyển file từ nguồn sang đích
+        shutil.move(source_path, destination_path)
+        
+        print(f"File đã được chuyển đến: {destination_path}")
