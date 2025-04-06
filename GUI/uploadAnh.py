@@ -12,17 +12,18 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from PIL import Image as PILImage
 from kivy.uix.label import Label
-
+from datetime import datetime
+import cv2
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from model.user_crud import *
+from model.history_crud import *
 
 
 # Import từ các file header.py và footer.py
 from footer import Footer
 from header import Header
-
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from model.user_crud import *
 
 
 classes = {
@@ -188,13 +189,49 @@ class UploadScreen(BoxLayout, Screen):
 
             # Hiển thị kết quả
             self.result_label.text = f"Kết quả dự đoán: {classes[predicted_class]}"
+            
+            #lưu ảnh và lịch sử 
+            img_path = str(self.save_image(image,"image/img_scan_upload"))
+            user_id = str(load_user_id())
+            description = f"Kết quả dự đoán: {classes[predicted_class]}"
+            add_history(user_id,1,img_path,description) #thêm vào lịch sử
         else:
             self.result_label.text = "Vui lòng chọn ảnh trước!"
+            
+        
     
     def back_to_history(self, instance):
             """Chuyển sang màn hình lịch sử"""
             self.screen_manager.current = 'history'       
 
+    def save_image(self,image, folder_path, filename_prefix="capture"):
+        # Tạo folder nếu chưa tồn tại
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+    # Chuyển đổi ảnh về định dạng phù hợp
+        if image.dtype != np.uint8:
+            image = (image * 255).astype(np.uint8)  # Chuyển giá trị về [0,255] và kiểu uint8
+
+    # Loại bỏ batch dimension nếu có
+        if len(image.shape) == 4:  
+            image = image[0]  # Chỉ lấy ảnh đầu tiên trong batch
+        
+        # Tạo tên file theo thời gian
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{filename_prefix}_{timestamp}.png"
+        file_path = os.path.join(folder_path, filename)
+
+        # Lưu ảnh bằng OpenCV
+        success = cv2.imwrite(file_path, image)
+        
+        if success:
+            print(f"Ảnh đã được lưu tại: {file_path}")
+            return filename
+        else:
+            print("Lỗi khi lưu ảnh.")
+            return None
+            
         
 class UploadApp(App):
     def build(self):
