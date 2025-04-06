@@ -214,7 +214,7 @@ class ScanScreen(Screen):
             # Lưu ảnh đã scan vào folder
             img_path = str(self.save_image(img,"image/img_scan_upload"))
             user_id = str(load_user_id())
-            description = "Kết quả: " + str(result_text)
+            description = str(result_text)
             add_history(user_id,2,img_path,description) #thêm vào lịch sử
             
 

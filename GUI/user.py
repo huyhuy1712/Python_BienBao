@@ -16,6 +16,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import shutil
 from model.user_crud import *
+
 class EditProfileScreen(BoxLayout):
     def __init__(self,screen_manager, **kwargs):
         super().__init__(orientation='vertical', spacing=10, padding=0, size_hint=(1, 1), **kwargs)
@@ -27,9 +28,12 @@ class EditProfileScreen(BoxLayout):
         
         self.add_widget(Label(text="Chỉnh sửa hồ sơ", font_size=28, bold=True, color=(0, 0, 0, 1), size_hint=(1, 0.1)))
         
-        self.current_username = "hoainam"
-        self.current_password = ""
-        self.current_avatar = "image/"+get_avatar_by_id(get_user_id_from_username(self.current_username))
+        user_id = load_user_id()
+        curr_user = get_user_by_id(str(user_id)) #lấy ra user hiện tại
+        
+        self.current_username = str(curr_user["username"])
+        self.current_password = str(curr_user["password"])
+        self.current_avatar = "image/"+ str(curr_user["avatar"])
         
         avatar_layout = BoxLayout(orientation='vertical', size_hint=(1, 0.4), spacing=10)
         self.avatar = Image(source=self.current_avatar, size_hint=(1, 0.8))
@@ -45,13 +49,13 @@ class EditProfileScreen(BoxLayout):
         
         username_layout = BoxLayout(orientation='horizontal', size_hint=(1, None), height=50)
         username_layout.add_widget(Label(text="Tên tài khoản:", font_size=18, color=(0, 0, 0, 1), size_hint=(0.3, 1)))
-        self.username_input = TextInput(text=self.current_username, multiline=False, size_hint=(0.7, 1),readonly=True)
+        self.username_input = TextInput(text=self.current_username, disabled=True, multiline=False, size_hint=(0.7, 1),readonly=True)
         username_layout.add_widget(self.username_input)
         form_layout.add_widget(username_layout)
         
         password_layout = BoxLayout(orientation='horizontal', size_hint=(1, None), height=50)
         password_layout.add_widget(Label(text="Mật khẩu:", font_size=18, color=(0, 0, 0, 1), size_hint=(0.3, 1)))
-        self.password_input = TextInput(text=self.current_password, multiline=False, password=True, size_hint=(0.7, 1))
+        self.password_input = TextInput(text=self.current_password, multiline=False, disabled=True, size_hint=(0.7, 1))
         password_layout.add_widget(self.password_input)
         form_layout.add_widget(password_layout)
         
@@ -85,7 +89,7 @@ class EditProfileScreen(BoxLayout):
         layout = BoxLayout(orientation='vertical')
 
         # Đặt root_path về thư mục gốc của hệ thống
-        system_root = "C:/" if os.name == "nt" else "/"  # Windows thì "C:/", Linux/macOS thì "/"
+        system_root = "D:/" if os.name == "nt" else "/"  # Windows thì "C:/", Linux/macOS thì "/"
         self.file_view = FileChooserListView(rootpath=system_root, filters=['*.png', '*.jpg', '*.jpeg'])
         layout.add_widget(self.file_view)
 
@@ -123,29 +127,43 @@ class EditProfileScreen(BoxLayout):
         popup.open()
 
     def on_save_button_click(self, instance):
-        iduser = get_user_id_from_username(self.current_username)
+        id_user = str(load_user_id())
+        new_password = self.new_password_input.text
+        confirm_password = self.confirm_password_input.text
+        image = os.path.basename(self.avatar.source)
         
-        if check_Password(iduser, self.password_input.text) == True:
-            if self.new_password_input.text == self.confirm_password_input.text:
-                # Cập nhật mật khẩu và avatar
-                check_change = update_pass_avatar(iduser, self.password_input.text, self.new_password_input.text, os.path.basename(self.avatar.source))
-                if check_change == True:
-                    # Nếu thay đổi thành công, thông báo thành công
-                    self.show_popup("Thành công", "Lưu thay đổi thành công!")
-                else:
-                    # Nếu không thay đổi thành công, thông báo lỗi
-                    self.show_popup("Lỗi", "Không thể lưu thay đổi!")
-            else:
-                # Nếu mật khẩu mới và xác nhận mật khẩu không khớp
-                self.show_popup("Lỗi", "Mật khẩu mới và xác nhận mật khẩu không khớp!")
-        else:
-            # Nếu mật khẩu cũ không chính xác
-            self.show_popup("Lỗi", "Mật khẩu cũ không đúng!")
+        if not new_password or not confirm_password:
+            self.show_popup("Lỗi", "Hãy nhập mật khẩu mới!")
+            return
+        if not self.check_password(new_password):
+            return
+        if new_password != confirm_password:
+            self.show_popup("Lỗi", "Mật khẩu xác nhận không khớp!")
+            return
+        update_user(id_user,new_password,image) # Cập nhật lên database
+        self.show_popup("Xác nhận", "Cập nhật thông tin thành công")
 
+
+        
+        
+    def check_password(self, password):
+    # Kiểm tra độ dài mật khẩu
+        if len(password) != 5:
+            self.show_popup("Lỗi", "Mật khẩu phải có đúng 5 kí tự")
+            return False
+        
+        # Kiểm tra có ít nhất một chữ cái và một số
+        if not re.search(r'[a-zA-Z]', password) or not re.search(r'[0-9]', password):
+            self.show_popup("Lỗi", "Mật khẩu phải có chứ cả chữ và số")
+            return False
+        
+        return True
+    
 class EditProfileApp(App):
     def build(self):
         sm = ScreenManager()
         return EditProfileScreen(sm)
 
 if __name__ == "__main__":
+
     EditProfileApp().run()

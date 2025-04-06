@@ -1,5 +1,6 @@
 #Phải import cái này máy t(nam) chạy mới được
 #Dòng này thêm thư mục cha (Python_BienBao) vào sys.path, giúp Python nhận diện package model khi chạy file .py trực tiếp.
+import re
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -50,58 +51,6 @@ def delete_user(user_id):
         conn.commit()
         close_connection(conn, cursor)
         print("✅ User deleted successfully!")
-
-def update_pass_avatar(user_id, current_pass, newpass, new_avatar):
-    conn = get_connection()  # Lấy kết nối đến CSDL
-    if conn:
-        try:
-            cursor = conn.cursor()
-            sql = "UPDATE user SET password = %s, avatar = %s WHERE id_user = %s and password = %s"
-            values = (newpass, new_avatar, user_id, current_pass)
-            cursor.execute(sql, values)
-            
-            # Kiểm tra nếu có dòng nào bị ảnh hưởng
-            if cursor.rowcount > 0:
-                conn.commit()  # Chỉ commit khi có dòng bị thay đổi
-                return True
-            else:
-                return False  # Nếu không có dòng nào bị thay đổi
-        except Exception as e:
-            print(f"Error: {e}")
-            return False  # Nếu có lỗi xảy ra
-        finally:
-            # Đảm bảo đóng kết nối và con trỏ
-            close_connection(conn, cursor)
-    else:
-        return False  # Nếu không kết nối được đến CSDL
-
-def check_Password(user_id, password):
-    conn = get_connection()  # Lấy kết nối đến CSDL
-    if conn:
-        try:
-            cursor = conn.cursor()
-            # Truy vấn để kiểm tra mật khẩu
-            sql = "SELECT password FROM user WHERE id_user = %s"
-            cursor.execute(sql, (user_id,))
-            
-            result = cursor.fetchone()  # Lấy một kết quả (dòng) từ truy vấn
-            if result:
-                # Kiểm tra mật khẩu
-                stored_password = result[0]
-                if stored_password == password:
-                    return True  # Mật khẩu đúng
-                else:
-                    return False  # Mật khẩu sai
-            else:
-                return False  # Không tìm thấy người dùng với id_user
-        except Exception as e:
-            print(f"Error: {e}")
-            return False  # Nếu có lỗi xảy ra
-        finally:
-            # Đảm bảo đóng kết nối và con trỏ
-            close_connection(conn, cursor)
-    else:
-        return False  # Nếu không kết nối được đến CSDL
 
 
 def get_user_id_from_username(username):
@@ -190,3 +139,38 @@ def is_avatar_exist(avatar_name, folder="image/"):
 
     avatar_path = os.path.join(folder, avatar_name.strip())  # Tạo đường dẫn đầy đủ
     return os.path.isfile(avatar_path)  # Trả về True nếu file tồn tại, ngược lại False
+
+def is_username_exist(username):
+    conn = get_connection()  # Kết nối đến cơ sở dữ liệu
+    if conn:
+        try:
+            cursor = conn.cursor()
+            # Truy vấn để kiểm tra xem username có tồn tại trong cơ sở dữ liệu không
+            sql = "SELECT COUNT(*) FROM user WHERE username = %s"
+            cursor.execute(sql, (username,))
+            
+            result = cursor.fetchone()  # Lấy kết quả của câu truy vấn
+            if result and result[0] > 0:
+                return True  # Nếu username tồn tại
+            else:
+                return False  # Nếu username không tồn tại
+        except Exception as e:
+            print(f"Error: {e}")
+            return False  # Nếu có lỗi xảy ra
+        finally:
+            # Đảm bảo đóng kết nối và con trỏ
+            close_connection(conn, cursor)
+    else:
+        return False  # Nếu không kết nối được đến CSDL
+    
+    # UPDATE - Cập nhật thông tin user
+def update_user(user_id, new_password, new_avatar):
+    conn = get_connection()
+    if conn:
+        cursor = conn.cursor()
+        sql = "UPDATE user SET password = %s, avatar = %s WHERE id_user = %s"
+        values = (new_password, new_avatar, user_id)
+        cursor.execute(sql, values)
+        conn.commit()
+        close_connection(conn, cursor)
+        print("User updated successfully!")
