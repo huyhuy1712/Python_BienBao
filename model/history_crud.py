@@ -10,7 +10,7 @@ sys.path.append(parent_dir)
 from model.db_connection import get_connection, close_connection
 from mysql.connector import Error
 
-def get_history_data():
+def get_history_data(user_id):
     conn = get_connection()
     if conn is None:
         print("Không thể kết nối đến cơ sở dữ liệu.")
@@ -19,13 +19,18 @@ def get_history_data():
     try:
         print("Creating cursor")
         cursor = conn.cursor()
-        print("Executing query: SELECT id_user, id_sign, type, time, image, description FROM history")
-        cursor.execute("SELECT id_user, id_sign, type, time, image, description FROM history")
+        print(f"Executing query for user_id: {user_id}")
+        query = """
+            SELECT id_user, id_sign, type, time, image, description
+            FROM history
+            WHERE id_user = %s
+        """
+        cursor.execute(query, (user_id,))
         history_data = cursor.fetchall()
         if not history_data:
-            print("Không có dữ liệu trong bảng history.")
+            print(f"Không có dữ liệu trong bảng history cho user_id = {user_id}.")
         else:
-            print(f"Fetched {len(history_data)} rows: {history_data}")
+            print(f"Fetched {len(history_data)} rows for user_id {user_id}: {history_data}")
         return history_data
     except Error as e:
         print(f"Lỗi khi truy vấn dữ liệu: {e}")
@@ -37,6 +42,7 @@ def get_history_data():
         return None
     finally:
         close_connection(conn, cursor)
+
 
 def add_history(id_user, type, image, description):
     conn = get_connection()
@@ -57,4 +63,31 @@ def add_history(id_user, type, image, description):
             cursor.close()
             conn.close()
 
-    
+def count_activity_by_type(user_id):
+    conn = get_connection()
+    if conn is None:
+        print("Không thể kết nối đến cơ sở dữ liệu.")
+        return None
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        query = """
+            SELECT type, COUNT(*) 
+            FROM history 
+            WHERE id_user = %s 
+            GROUP BY type
+        """
+        cursor.execute(query, (user_id,))
+        results = cursor.fetchall()
+
+        counts = {1: 0, 2: 0}  # 1 = Upload, 2 = Scan
+        for activity_type, count in results:
+            counts[activity_type] = count
+
+        return counts
+    except Error as e:
+        print(f"Lỗi truy vấn: {e}")
+        return None
+    finally:
+        close_connection(conn, cursor)
+

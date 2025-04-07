@@ -1,13 +1,18 @@
 from kivy.uix.boxlayout import BoxLayout
-from kivymd.app import MDApp
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.uix.screenmanager import Screen
 from kivy.graphics import Color, RoundedRectangle
+from kivy.uix.label import Label
+from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.image import Image
 from footer import Footer
 from header import Header
+from scan import ScanScreen
+from uploadAnh import UploadScreen
+from lichSu import HistoryScreen
+from inf_signs import PageScreen
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -69,7 +74,25 @@ class MainScreen(Screen):
         if instance.collide_point(*touch.pos):
             if self.manager:
 
+                if screen_name in self.manager.screen_names:
+                    if(screen_name == "scan"):
+                        scan_screen = self.manager.get_screen('scan')
+                        scan_screen.clear_camera()
+                    self.manager.remove_widget(self.manager.get_screen(screen_name))
+                    
+                if(screen_name == "scan"):
+                    self.manager.add_widget(ScanScreen(self.manager,name="scan"))
+                if(screen_name == "upload"):
+                    self.manager.add_widget(UploadScreen(self.manager,name="upload"))
+                if(screen_name == "history"):
+                    self.manager.add_widget(HistoryScreen(self.manager,name="history"))
+                if(screen_name == "info"):
+                    self.manager.add_widget(PageScreen(self.manager,name="info"))
+                    
+                    
                 print(f"Chuyen sang man hinh: {screen_name}")  
+                print(self.manager)
+                
                 self.manager.current = screen_name
             else:
                 print("ScreenManager chưa được gán vào MainScreen!")
@@ -78,4 +101,5 @@ class MainScreen(Screen):
         instance.rect.size = instance.size
         instance.rect.pos = instance.pos
 
-    
+
+

@@ -248,25 +248,9 @@ class Login(Screen):
                 
                 #tao moi screen manager
                 # Tạo MainScreen và truyền screen_manager
-                main_screen = MainScreen(self.screen_manager, name='main')
-                # Tạo ScanScreen và truyền Header
-                scan_screen = ScanScreen(self.screen_manager, name='scan')
-                # Tạo UploadScreen truyền vào ScreenManager
-                upload_screen = UploadScreen(self.screen_manager,name='upload')
-                # Tạo UploadScreen truyền vào ScreenManager
-                history_screen = HistoryScreen(self.screen_manager,name='history')
-                sign_screen = PageScreen(self.screen_manager,name='info')
-                        # Tạo màn hình User
-                user_screen = Screen(name='user')
-                user_screen.add_widget(EditProfileScreen(self.screen_manager))
-                
+                main_screen = MainScreen(self.screen_manager, name='main')       
                 self.screen_manager.add_widget(main_screen)  # Thêm màn hình chính
-                self.screen_manager.add_widget(scan_screen)  # Thêm màn hình Scan
-                self.screen_manager.add_widget(user_screen) # Thêm màn hình user
-                self.screen_manager.add_widget(sign_screen) # Thêm màn hình sign
-                self.screen_manager.add_widget(upload_screen) # Thêm màn hình upload    
-                self.screen_manager.add_widget(history_screen) # Thêm màn hình lịch sử 
-                
+
                 if self.manager:  # Kiem tra neu co ScreenManager
                     self.manager.current = "main"
                 else:

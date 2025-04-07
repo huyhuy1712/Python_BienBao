@@ -52,19 +52,23 @@ class Footer(BoxLayout):
 
     def go_home(self, instance):
         if self.screen_manager and 'main' in self.screen_manager.screen_names:
-            # print("Chuyển về màn hình main")
             self.screen_manager.current = 'main'
-        else:
-            print(" Lỗi: Không tìm thấy màn hình 'main'")
+
 
     def logout(self, instance):
         if self.screen_manager:
-            self.screen_manager.remove_widget(self.screen_manager.get_screen("main"))
-            self.screen_manager.remove_widget(self.screen_manager.get_screen("scan"))
-            self.screen_manager.remove_widget(self.screen_manager.get_screen("upload"))
-            self.screen_manager.remove_widget(self.screen_manager.get_screen("history"))
-            self.screen_manager.remove_widget(self.screen_manager.get_screen("info"))
-            self.screen_manager.remove_widget(self.screen_manager.get_screen("user"))
+            if 'main' in self.screen_manager.screen_names:
+                self.screen_manager.remove_widget(self.screen_manager.get_screen("main"))
+            if 'scan' in self.screen_manager.screen_names:
+                self.screen_manager.remove_widget(self.screen_manager.get_screen("scan"))
+            if 'upload' in self.screen_manager.screen_names:
+                self.screen_manager.remove_widget(self.screen_manager.get_screen("upload"))
+            if 'history' in self.screen_manager.screen_names:
+                self.screen_manager.remove_widget(self.screen_manager.get_screen("history"))
+            if 'info' in self.screen_manager.screen_names:
+                self.screen_manager.remove_widget(self.screen_manager.get_screen("info"))
+            if 'user' in self.screen_manager.screen_names:
+                self.screen_manager.remove_widget(self.screen_manager.get_screen("user"))
             
             
             

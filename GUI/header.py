@@ -12,6 +12,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from model.user_crud import *
+from model.history_crud import *
 
 
 
@@ -39,7 +40,8 @@ class CircularImage(ButtonBehavior, Widget):
         # print("Avatar được nhấn, chuyển sang màn hình user")
         if self.screen_manager:
             
-            self.screen_manager.remove_widget(self.screen_manager.get_screen("user"))
+            if 'user' in self.screen_manager.screen_names:
+                self.screen_manager.remove_widget(self.screen_manager.get_screen("user"))
             
             user_screen = Screen(name='user')
             user_screen.add_widget(EditProfileScreen(self.screen_manager))
@@ -75,12 +77,15 @@ class Header(BoxLayout):
 
         self.avatar = CircularImage(source=avatar_user, screen_manager=self.screen_manager, size=(60, 60))
 
+        count_upload = count_activity_by_type(str(self.curr_user["id_user"]))[1]
+        count_scan = count_activity_by_type(str(self.curr_user["id_user"]))[2]
+
         # Thông tin người dùng
         username = "Username: " + str(self.curr_user["username"])
         self.user_info = BoxLayout(orientation='vertical', size_hint=(None, None), size=("220dp", "60dp"))
         self.username_label = Label(text=username, color=(1, 1, 1, 1), font_size=18, bold=True)
-        self.scan_count_label = Label(text="Số lần Scan: 10", color=(1, 1, 1, 1), font_size=16)
-        self.upload_count_label = Label(text="Số lần Upload: 5", color=(1, 1, 1, 1), font_size=16)
+        self.scan_count_label = Label(text=f"Số lần Scan: {count_scan}", color=(1, 1, 1, 1), font_size=16)
+        self.upload_count_label = Label(text=f"Số lần Upload: {count_upload}", color=(1, 1, 1, 1), font_size=16)
         self.user_info.add_widget(self.username_label)
         self.user_info.add_widget(self.scan_count_label)
         self.user_info.add_widget(self.upload_count_label)

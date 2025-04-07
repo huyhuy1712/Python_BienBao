@@ -1,4 +1,3 @@
-from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.image import Image
@@ -232,13 +231,3 @@ class UploadScreen(BoxLayout, Screen):
             print("Lỗi khi lưu ảnh.")
             return None
             
-        
-class UploadApp(App):
-    def build(self):
-        sm = ScreenManager()
-
-        Window.clearcolor = (1, 1, 1, 1)  # Nền trắng
-        return UploadScreen(sm)
-
-if __name__ == "__main__":
-    UploadApp().run()
