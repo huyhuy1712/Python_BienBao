@@ -43,7 +43,6 @@ def get_history_data(user_id):
     finally:
         close_connection(conn, cursor)
 
-
 def add_history(id_user, type, image, description):
     conn = get_connection()
     if conn is None:
@@ -54,7 +53,9 @@ def add_history(id_user, type, image, description):
             cursor = conn.cursor()
             query = "INSERT INTO history (id_user, id_sign, type, time, image, description) VALUES (%s, %s, %s, %s, %s, %s)"
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            cursor.execute(query, (id_user, 1, type, timestamp, image, description))
+            # Ghép đường dẫn đầy đủ cho image
+            full_image_path = f"image\img_scan_upload\{image}"
+            cursor.execute(query, (id_user, 1, type, timestamp, full_image_path, description))
             conn.commit()
             print("Đã thêm lịch sử thành công.")
         except Exception as e:
