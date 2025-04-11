@@ -231,7 +231,7 @@ class Login(Screen):
                 host="localhost",
                 user="root",
                 password="",
-                database="bienbao"
+                database="bienbao",
             )
             cursor = conn.cursor()
             query = "SELECT * FROM user WHERE username = %s AND password = %s"
